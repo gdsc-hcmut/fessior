@@ -1,25 +1,25 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
-import appConfig from './config/app.config';
-import databaseConfig from './config/database.config';
-import authConfig from './config/auth.config';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, authConfig],
     }),
-    MongooseModule.forRoot(process.env.DATABASE_HOST ?? ''),
+    MongooseModule.forRoot(process.env.DATABASE_HOST),
     LoggerModule.forRoot({
       pinoHttp: {
-        customProps: (req, res) => ({
+        customProps: () => ({
           context: 'HTTP',
         }),
         transport: {
@@ -30,10 +30,34 @@ import authConfig from './config/auth.config';
         },
       },
     }),
+    // Static Folder
+    // https://docs.nestjs.com/recipes/serve-static
+    // https://docs.nestjs.com/techniques/mvc
+    ServeStaticModule.forRoot({
+      rootPath: `${__dirname}/../public`,
+      renderPath: '/',
+    }),
     CoreModule,
     UsersModule,
+    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Global Guard, Authentication check on all routers
+    // { provide: APP_GUARD, useClass: AuthenticatedGuard },
+    // Global Filter, Exception check
+    { provide: APP_FILTER, useClass: ExceptionsFilter },
+    // Global Pipe, Validation check
+    // https://docs.nestjs.com/pipes#global-scoped-pipes
+    // https://docs.nestjs.com/techniques/validation
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true, // transform object to DTO class
+        whitelist: true,
+      }),
+    },
+  ],
 })
 export class AppModule {}

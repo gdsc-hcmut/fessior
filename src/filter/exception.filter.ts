@@ -1,11 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-  LoggerService,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, LoggerService } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces/features/arguments-host.interface';
 import { Response } from 'express';
 
@@ -13,10 +6,7 @@ import { Response } from 'express';
 export class AllExceptionFilter implements ExceptionFilter {
   constructor(private logger: LoggerService) {}
 
-  private static handleResponse(
-    response: Response,
-    exception: HttpException | Error,
-  ): void {
+  private static handleResponse(response: Response, exception: HttpException | Error): void {
     let responseBody: any = { message: 'Internal server error' };
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -25,7 +15,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       statusCode = exception.getStatus();
     } else if (exception instanceof Error) {
       responseBody = {
-        statusCode: statusCode,
+        statusCode,
         message: exception.stack,
       };
     }
@@ -33,7 +23,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     response.status(statusCode).json(responseBody);
   }
 
-  catch(exception: HttpException | Error, host: ArgumentsHost): void {
+  public catch(exception: HttpException | Error, host: ArgumentsHost): void {
     const ctx: HttpArgumentsHost = host.switchToHttp();
     const response: Response = ctx.getResponse();
 
@@ -50,7 +40,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       message = JSON.stringify(exception.getResponse());
     } else if (exception instanceof Error) {
-      message = exception?.stack?.toString() ?? '';
+      message = exception.stack?.toString() ?? '';
     }
 
     this.logger.error(message);

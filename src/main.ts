@@ -1,8 +1,7 @@
+import { Logger as NestLogger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Logger as NestLogger } from '@nestjs/common';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
@@ -25,7 +24,7 @@ async function bootstrap(): Promise<string> {
     app.enable('trust proxy');
   }
 
-  //Enable versioning v1,v2,...
+  // Enable versioning v1,v2,...
   app.enableVersioning({
     type: VersioningType.URI,
   });

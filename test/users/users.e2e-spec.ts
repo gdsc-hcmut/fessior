@@ -1,25 +1,20 @@
 import { INestApplication } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
+
+import { CoreModule } from '../../src/core/core.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
-import { CoreModule } from '../../src/core/core.module';
-import { MongooseModule } from '@nestjs/mongoose';
 
 describe('Users', () => {
-  const usersService = { findAll: () => ['test'] };
+  const usersService = { findAll: (): Array<string> => ['test'] };
 
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [
-        UsersModule,
-        MongooseModule.forRoot(
-          'mongodb+srv://GDSC:gdscurlshortener123@cluster0.4mncv.mongodb.net/new_fessior?authSource=admin&replicaSet=atlas-h2i7y8-shard-0&w=majority&readPreference=primary&retryWrites=true&ssl=true',
-        ),
-        CoreModule,
-      ],
+      imports: [UsersModule, MongooseModule.forRoot(process.env.DB_HOST), CoreModule],
     })
       .overrideProvider(UsersService)
       .useValue(usersService)
@@ -29,7 +24,8 @@ describe('Users', () => {
     await app.init();
   });
 
-  it(`/GET users`, () => {
+  it(`/GET users`, async () => {
+    expect(true).toBeDefined();
     return request(app.getHttpServer()).get('/users').expect(200).expect({
       data: usersService.findAll(),
     });

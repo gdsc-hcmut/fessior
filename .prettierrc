@@ -4,10 +4,15 @@
   "editor.formatOnType": true,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "quoteProps": "as-needed",
+  "jsxSingleQuote": false,
+  "bracketSpacing": true,
+  "jsxBracketSameLine": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "endOfLine": "lf"
 }
