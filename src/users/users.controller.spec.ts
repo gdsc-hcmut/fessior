@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
+
 import { CreateUserDto } from './dto/create-user.dto';
+import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 describe('Cats Controller', () => {
@@ -50,9 +51,7 @@ describe('Cats Controller', () => {
 
   describe('create()', () => {
     it('should create a new user', async () => {
-      const createSpy = jest
-        .spyOn(service, 'create')
-        .mockResolvedValueOnce(mockUser);
+      const createSpy = jest.spyOn(service, 'create').mockResolvedValueOnce(mockUser);
 
       await controller.create(createUserDto);
       expect(createSpy).toHaveBeenCalledWith(createUserDto);
@@ -61,7 +60,7 @@ describe('Cats Controller', () => {
 
   describe('findAll()', () => {
     it('should return an array of users', async () => {
-      expect(controller.findAll()).resolves.toEqual([
+      await expect(controller.findAll()).resolves.toEqual([
         {
           email: 'lygioian1@gmail.com',
           name: 'Ly Gioi An1',
@@ -75,7 +74,7 @@ describe('Cats Controller', () => {
           name: 'Ly Gioi An3',
         },
       ]);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(service.findAll.bind(service)).toHaveBeenCalled();
     });
   });
 });

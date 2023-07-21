@@ -1,8 +1,9 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-import { UsersService } from './users.service';
+
 import { User } from './schemas/user.schema';
+import { UsersService } from './users.service';
 
 const mockUser = {
   email: 'lygioian@gmail.com',
@@ -34,8 +35,8 @@ describe('UsersService', () => {
             new: jest.fn().mockResolvedValue(mockUser),
             constructor: jest.fn().mockResolvedValue(mockUser),
             find: jest.fn(),
-            create: jest.fn(),
-            exec: jest.fn(),
+            create: jest.fn().mockImplementation((data: User) => data),
+            exec: jest.fn().mockResolvedValueOnce(usersArray),
           },
         },
       ],
@@ -50,24 +51,20 @@ describe('UsersService', () => {
   });
 
   it('should return all users', async () => {
-    jest.spyOn(model, 'find').mockReturnValue({
-      exec: jest.fn().mockResolvedValueOnce(usersArray),
-    } as any);
-    const cats = await service.findAll();
-    expect(cats).toEqual(usersArray);
+    const findSpy = jest.spyOn(model, 'find');
+    const users = await service.findAll();
+    expect(findSpy).toHaveBeenCalledTimes(1); // Check if the find method was called
+    expect(users).toEqual(usersArray);
   });
 
   it('should insert a new user', async () => {
-    jest.spyOn(model, 'create').mockImplementationOnce(() =>
-      Promise.resolve({
-        email: 'lygioian@gmail.com',
-        name: 'Ly Gioi An',
-      } as any),
-    );
-    const newUser = await service.create({
+    const createSpy = jest.spyOn(model, 'create');
+    const newUser: User = {
       email: 'lygioian@gmail.com',
       name: 'Ly Gioi An',
-    });
-    expect(newUser).toEqual(mockUser);
+    };
+    const createdUser = await service.create(newUser);
+    expect(createSpy).toHaveBeenCalledTimes(1); // Check if the create method was called
+    expect(createdUser).toEqual(newUser);
   });
 });

@@ -14,7 +14,7 @@ describe('Users', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [UsersModule, MongooseModule.forRoot(process.env.DB_HOST), CoreModule],
+      imports: [UsersModule, MongooseModule.forRoot(process.env.DATABASE_HOST), CoreModule],
     })
       .overrideProvider(UsersService)
       .useValue(usersService)
