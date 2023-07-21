@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
-describe('Cats Controller', () => {
+describe('Users Controller', () => {
   let controller: UsersController;
   let service: UsersService;
   const createUserDto: CreateUserDto = {
