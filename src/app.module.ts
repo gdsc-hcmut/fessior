@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
+import { TemplatesModule } from './templates/templates.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     }),
     CoreModule,
     UsersModule,
+    TemplatesModule,
     CommonModule,
   ],
   controllers: [AppController],

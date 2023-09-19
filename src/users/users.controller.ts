@@ -16,7 +16,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Version('2')
+  @Version('2') // This version will override the previous
   @Get()
   public async findAll(): Promise<User[]> {
     return this.usersService.findAll();
