@@ -1,6 +1,6 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE, RouterModule } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
@@ -40,8 +40,30 @@ import { UsersModule } from './users/users.module';
     }),
     CoreModule,
     UsersModule,
-    TemplatesModule,
     CommonModule,
+    TemplatesModule,
+    RouterModule.register([
+      // Router for user path
+      {
+        path: 'api',
+        children: [
+          {
+            path: 'templates',
+            module: TemplatesModule,
+          },
+        ],
+      },
+      // Router for admin path
+      {
+        path: 'admin/api',
+        children: [
+          {
+            path: 'templates',
+            module: TemplatesModule,
+          },
+        ],
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [
