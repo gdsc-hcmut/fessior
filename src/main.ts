@@ -1,3 +1,4 @@
+/* eslint-disable import/no-import-module-exports */
 import { Logger as NestLogger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -5,6 +6,9 @@ import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
+
+// TODO enhance this better with ts
+declare const module: any;
 
 async function bootstrap(): Promise<string> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -33,6 +37,13 @@ async function bootstrap(): Promise<string> {
   app.enableShutdownHooks();
 
   await app.listen(process.env.PORT || 3000);
+
+  if (module.hot) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    module.hot.accept();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    module.hot.dispose(async () => app.close());
+  }
 
   return app.getUrl();
 }
