@@ -2,13 +2,19 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface Response<T> {
-  data: T;
+export interface Response {
+  payload: unknown;
+  message: string;
 }
 
+const DEFAULT_MESSAGE = 'Success';
+
 @Injectable()
-export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
-  public intercept(_: ExecutionContext, next: CallHandler<T>): Observable<Response<T>> {
-    return next.handle().pipe(map(data => ({ data })));
+export class TransformInterceptor implements NestInterceptor<unknown, Response> {
+  public intercept(ctx: ExecutionContext, next: CallHandler): Observable<Response> {
+    const { statusCode } = ctx.switchToHttp().getResponse();
+    return next
+      .handle()
+      .pipe(map(data => ({ payload: data.payload, message: data.message ?? DEFAULT_MESSAGE, statusCode })));
   }
 }
