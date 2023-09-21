@@ -12,6 +12,9 @@ export declare global {
 
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
+
+      SWAGGER_USER: string;
+      SWAGGER_PASSWORD: string;
     }
   }
 

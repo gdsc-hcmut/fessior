@@ -2,6 +2,8 @@
 import { Logger as NestLogger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import expressBasicAuth from 'express-basic-auth';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { middleware } from './app.middleware';
@@ -14,6 +16,7 @@ async function bootstrap(): Promise<string> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
+
   const isProduction = process.env.NODE_ENV === 'production';
 
   app.useLogger(app.get(Logger));
@@ -33,6 +36,22 @@ async function bootstrap(): Promise<string> {
     defaultVersion: '1', // default version
     type: VersioningType.URI,
   });
+
+  app.use(
+    ['/api-docs'],
+    expressBasicAuth({ challenge: true, users: { [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD } }),
+  );
+
+  const config = new DocumentBuilder()
+    .setTitle('Fessior Community')
+    .setDescription('The Fessior Community API description')
+    .setVersion('1.0')
+    .addTag('Fessior Community')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
+
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
 
   app.enableShutdownHooks();
 
