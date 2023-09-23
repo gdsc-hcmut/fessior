@@ -7,6 +7,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
 import { TemplatesModule } from './templates/templates.module';
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
       renderPath: '/',
     }),
     CoreModule,
+    AuthModule,
     UsersModule,
     CommonModule,
     TemplatesModule,
@@ -50,6 +52,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'templates',
             module: TemplatesModule,
+          },
+          {
+            path: 'auth',
+            module: AuthModule,
           },
         ],
       },

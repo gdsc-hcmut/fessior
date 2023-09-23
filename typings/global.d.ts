@@ -15,6 +15,9 @@ export declare global {
 
       SWAGGER_USER: string;
       SWAGGER_PASSWORD: string;
+
+      GOOGLE_CLIENT_ID: string;
+      GOOGLE_CLIENT_SECRET: string;
     }
   }
 
