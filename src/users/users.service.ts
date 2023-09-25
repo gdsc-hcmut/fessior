@@ -3,15 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './schemas/user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
   private readonly logger: Logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-  public async create(createUserDto: CreateUserDto): Promise<User> {
+  public async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     return this.userModel.create(createUserDto);
   }
 
@@ -20,11 +20,15 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  public async findOne(id: string): Promise<User | null> {
+  public async findOne(id: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
-  public async delete(id: string): Promise<User | null> {
+  public async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
+  }
+
+  public async delete(id: string): Promise<UserDocument | null> {
     return this.userModel.findByIdAndRemove({ _id: id }).exec();
   }
 }
