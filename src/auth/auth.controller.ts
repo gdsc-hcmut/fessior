@@ -1,12 +1,16 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 // import { Request } from 'express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { OAuth2Client } from 'google-auth-library';
 
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { TokenMetaDto } from './dto/tokenMeta.dto';
+import { TokenMeta } from '../constants/types';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 @Controller()
+@ApiBearerAuth('access-token')
 export class AuthController {
   constructor(public readonly authService: AuthService) {}
   @Post('/login')
@@ -16,6 +20,7 @@ export class AuthController {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     // log the ticket payload in the console to see what we have
+    console.log(token);
 
     const tokenInfo = ticket.getPayload();
     if (!tokenInfo || tokenInfo.exp < Date.now() / 1000) {
@@ -34,8 +39,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('/profile')
-  public getProfile(@Request() req: Request): any {
-    console.log(req.tokenMeta.userId);
+  public getProfile(@TokenMeta() tokenMeta: TokenMetaDto): any {
+    console.log(tokenMeta);
     return { payload: 'test' };
   }
 }

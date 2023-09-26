@@ -1,16 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, VERSION_NEUTRAL, Version } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, VERSION_NEUTRAL, Version } from '@nestjs/common';
 import { ControllerResponse } from 'src/constants/types';
 
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { Template } from './schemas/template.schema';
 import { TemplatesService } from './templates.service';
+import { AuthGuard } from '../auth/auth.guard';
 
-@Controller({
-  path: 'templates',
-  // version: '1', // Apply version 1 for these Controller.
-  // version: ['1', '2'], // Apply both version 1 and 2 for whole Controller.
-  // version: VERSION_NEUTRAL, // resource would not have the version present in the URI.
-})
+@UseGuards(AuthGuard)
+@Controller()
 export class TemplatesController {
   constructor(private readonly templateService: TemplatesService) {}
 

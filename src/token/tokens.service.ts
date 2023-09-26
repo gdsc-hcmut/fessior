@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
@@ -21,21 +21,38 @@ export class TokensService {
     const token = await this.tokenModel.findOne({ _id: tokenId });
 
     if (!token) {
-      throw Error('Could not find token');
+      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
     }
 
     return this.usersService.findOne(token.userId.toString());
   }
 
   public async deactivateToken(tokenId: string): Promise<TokenDocument> {
-    const token = await this.tokenModel.findOne({ _id: tokenId });
+    const token = await this.tokenModel.findById(new Types.ObjectId(tokenId));
 
     if (!token) {
-      throw Error('Could not find token');
+      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
     }
 
     token.isActivate = false;
     await token.save();
     return token;
+  }
+
+  public async checkValidToken(tokenId: string): Promise<boolean> {
+    const token = await this.tokenModel.findById(new Types.ObjectId(tokenId));
+
+    if (!token) {
+      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
+    }
+
+    console.log(Date.now(), token.expiredAt);
+
+    if (Date.now() > token.expiredAt) {
+      token.isActivate = false;
+      await token.save();
+    }
+
+    return token.isActivate;
   }
 }
