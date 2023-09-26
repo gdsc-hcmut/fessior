@@ -46,8 +46,6 @@ export class TokensService {
       throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
     }
 
-    console.log(Date.now(), token.expiredAt);
-
     if (Date.now() > token.expiredAt) {
       token.isActivate = false;
       await token.save();

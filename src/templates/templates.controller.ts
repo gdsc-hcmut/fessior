@@ -4,7 +4,7 @@ import { ControllerResponse } from 'src/constants/types';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { Template } from './schemas/template.schema';
 import { TemplatesService } from './templates.service';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller()

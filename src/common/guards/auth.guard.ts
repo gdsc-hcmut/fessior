@@ -4,7 +4,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 
-import { TokensService } from '../token/tokens.service';
+import { TokensService } from '../../token/tokens.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -34,8 +34,8 @@ export class AuthGuard implements CanActivate {
         throw Error();
       }
 
-      const userId = await this.tokensService.getUserToken(payload.tokenId);
-      const tokenMeta = { userId };
+      const user = await this.tokensService.getUserToken(payload.tokenId);
+      const tokenMeta = { userId: user?._id };
 
       request.tokenMeta = tokenMeta;
     } catch {
