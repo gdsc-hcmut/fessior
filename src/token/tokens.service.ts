@@ -17,11 +17,11 @@ export class TokensService {
     return this.tokenModel.create({ userId });
   }
 
-  public async getUserToken(tokenId: string): Promise<UserDocument | null> {
+  public async getUserByTokenId(tokenId: string): Promise<UserDocument | null> {
     const token = await this.tokenModel.findOne({ _id: tokenId });
 
     if (!token) {
-      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('The token does not exist', HttpStatus.UNAUTHORIZED);
     }
 
     return this.usersService.findOne(token.userId.toString());
@@ -31,7 +31,7 @@ export class TokensService {
     const token = await this.tokenModel.findById(new Types.ObjectId(tokenId));
 
     if (!token) {
-      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('The token does not exist', HttpStatus.UNAUTHORIZED);
     }
 
     token.isActivate = false;
@@ -43,7 +43,7 @@ export class TokensService {
     const token = await this.tokenModel.findById(new Types.ObjectId(tokenId));
 
     if (!token) {
-      throw new HttpException('Token is not valid', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('The token does not exist', HttpStatus.UNAUTHORIZED);
     }
 
     if (Date.now() > token.expiredAt) {

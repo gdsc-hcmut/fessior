@@ -1,44 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { TokenPayload } from 'google-auth-library';
+import { TokenPayload } from 'src/constants/types';
 
+import { JwtService } from '../jwt/jwt.services';
 import { TokensService } from '../token/tokens.service';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    public readonly tokensService: TokensService,
-    public readonly usersService: UsersService,
-    public readonly jwtService: JwtService,
+    private readonly tokensService: TokensService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  public async login(tokenInfo: TokenPayload): Promise<any> {
+  public async login(tokenInfo: TokenPayload): Promise<{ accessToken: string }> {
     const { email, name } = tokenInfo;
-    if (!email || !name) {
-      throw Error('Token is not right');
-    }
-    let user = await this.usersService.findByEmail(email);
 
-    if (!user) {
-      user = await this.usersService.create({ name, email });
-    }
+    const user = await this.usersService.getByEmail(email, name);
 
     const token = await this.tokensService.createToken(user._id);
 
     const payload = { tokenId: token._id };
 
-    return this.jwtService.signAsync(payload);
+    return { accessToken: await this.jwtService.signSync(payload) };
   }
 
-  public async logout(accessToken: string): Promise<any> {
-    const payload = await this.jwtService.verifyAsync(accessToken, {
-      secret: process.env.JWT_SECRET,
-    });
+  public async logout(accessToken: string): Promise<void> {
+    const payload = await this.jwtService.verifyAsync(accessToken);
 
-    const { tokenId } = payload;
-    if (typeof tokenId !== 'string') throw Error('Wrong type of tokenId');
-    const token = await this.tokensService.deactivateToken(tokenId);
-    return { payload: { token } };
+    const { tokenId }: { tokenId: string } = payload;
+
+    await this.tokensService.deactivateToken(tokenId);
   }
 }

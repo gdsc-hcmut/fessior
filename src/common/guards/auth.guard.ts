@@ -1,51 +1,54 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-// import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import type { Request } from 'express';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Request } from 'src/constants/types';
 
+import { JwtService } from '../../jwt/jwt.services';
 import { TokensService } from '../../token/tokens.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    // private reflector: Reflector,
-    public readonly jwtService: JwtService,
-    public readonly tokensService: TokensService,
-  ) {}
+  constructor(public readonly jwtService: JwtService, public readonly tokensService: TokensService) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const request: Request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
+      const payload = await this.jwtService.verifyAsync(token);
 
-      const { tokenId } = payload;
+      const { tokenId }: { tokenId: string } = payload;
 
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
       if (!(await this.tokensService.checkValidToken(tokenId))) {
-        throw Error();
+        throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
       }
 
-      const user = await this.tokensService.getUserToken(payload.tokenId);
-      const tokenMeta = { userId: user?._id };
+      const user = await this.tokensService.getUserByTokenId(tokenId);
+      if (!user) {
+        throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
+      }
 
-      request.tokenMeta = tokenMeta;
-    } catch {
+      request.tokenMeta = { userId: user._id };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new UnauthorizedException();
     }
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractTokenFromHeader(request: Request): string {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    if (type !== 'Bearer') {
+      throw new UnauthorizedException();
+    }
+
+    return token;
   }
 }

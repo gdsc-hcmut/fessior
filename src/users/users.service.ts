@@ -24,8 +24,12 @@ export class UsersService {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
-  public async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email });
+  public async getByEmail(email: string, name: string): Promise<UserDocument> {
+    let user = await this.userModel.findOne({ email });
+    if (!user) {
+      user = await this.userModel.create({ email, name });
+    }
+    return user;
   }
 
   public async delete(id: string): Promise<UserDocument | null> {
