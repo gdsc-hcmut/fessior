@@ -29,3 +29,6 @@ jobs:
            echo "Unit tests failed with exit code $exit_code. Stopping the workflow."
            exit $exit_code
           fi
+
+      - name: Build resources
+        run: echo "Build resources..."
