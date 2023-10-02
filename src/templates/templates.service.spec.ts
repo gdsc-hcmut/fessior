@@ -58,6 +58,6 @@ describe('TemplatesService', () => {
 
     const createdTemplate = await service.create(createTemplateDto);
     expect(createSpy).toHaveBeenCalledTimes(1); // Check if the create method was called
-    expect(createdTemplate).toEqual(1);
+    expect(createdTemplate).toEqual(createTemplateDto);
   });
 });
