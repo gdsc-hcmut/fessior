@@ -16,7 +16,7 @@ export class TemplatesService {
   }
 
   public async findAll(): Promise<Template[]> {
-    this.logger.log('Find all users');
+    this.logger.log('Find all templates');
     return this.templateModel.find().exec();
   }
 

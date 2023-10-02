@@ -60,6 +60,7 @@ describe('Users Controller', () => {
 
   describe('findAll()', () => {
     it('should return an array of users', async () => {
+      const spy = jest.spyOn(service, 'findAll');
       await expect(controller.findAll()).resolves.toEqual([
         {
           email: 'lygioian1@gmail.com',
@@ -74,7 +75,7 @@ describe('Users Controller', () => {
           name: 'Ly Gioi An3',
         },
       ]);
-      expect(service.findAll.bind(service)).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 });

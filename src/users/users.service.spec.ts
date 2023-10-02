@@ -34,9 +34,11 @@ describe('UsersService', () => {
           useValue: {
             new: jest.fn().mockResolvedValue(mockUser),
             constructor: jest.fn().mockResolvedValue(mockUser),
-            find: jest.fn(),
+            find: jest.fn().mockReturnValue({
+              exec: jest.fn().mockResolvedValue(usersArray),
+            }),
             create: jest.fn().mockImplementation((data: User) => data),
-            exec: jest.fn().mockResolvedValueOnce(usersArray),
+            findAll: jest.fn().mockResolvedValue(usersArray),
           },
         },
       ],
