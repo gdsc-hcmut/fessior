@@ -2,26 +2,23 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
 
+import { CreateTemplateDto } from './dto/create-template.dto';
 import { Template } from './schemas/template.schema';
 import { TemplatesService } from './templates.service';
 
-const mockUser = {
-  email: 'lygioian@gmail.com',
-  name: 'Ly Gioi An',
-};
-
-describe('UsersService', () => {
+describe('TemplatesService', () => {
   let service: TemplatesService;
   let model: Model<Template>;
+  const createTemplateDto: CreateTemplateDto = {
+    name: 'template1',
+  };
 
-  const usersArray = [
+  const templatesArray = [
     {
-      email: 'lygioian@gmail.com',
-      name: 'Ly Gioi An',
+      name: 'template1',
     },
     {
-      email: 'lygioian2@gmail.com',
-      name: 'Ly Gioi An2',
+      name: 'template2',
     },
   ];
 
@@ -30,41 +27,37 @@ describe('UsersService', () => {
       providers: [
         TemplatesService,
         {
-          provide: getModelToken('User'),
+          provide: getModelToken(Template.name),
           useValue: {
-            new: jest.fn().mockResolvedValue(mockUser),
-            constructor: jest.fn().mockResolvedValue(mockUser),
-            find: jest.fn(),
-            create: jest.fn().mockImplementation((data: Template) => data),
-            exec: jest.fn().mockResolvedValueOnce(usersArray),
+            find: jest.fn().mockReturnValue({
+              exec: jest.fn().mockResolvedValue(templatesArray),
+            }),
+            create: jest.fn().mockResolvedValue(createTemplateDto),
           },
         },
       ],
     }).compile();
 
     service = module.get<TemplatesService>(TemplatesService);
-    model = module.get<Model<Template>>(getModelToken('User'));
+    model = module.get<Model<Template>>(getModelToken('Template'));
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return all users', async () => {
+  it('should return all templates', async () => {
     const findSpy = jest.spyOn(model, 'find');
-    const users = await service.findAll();
+    const templates = await service.findAll();
     expect(findSpy).toHaveBeenCalledTimes(1); // Check if the find method was called
-    expect(users).toEqual(usersArray);
+    expect(templates).toEqual(templatesArray);
   });
 
-  it('should insert a new user', async () => {
+  it('should insert a new template', async () => {
     const createSpy = jest.spyOn(model, 'create');
-    const newUser: Template = {
-      email: 'lygioian@gmail.com',
-      name: 'Ly Gioi An',
-    };
-    const createdUser = await service.create(newUser);
+
+    const createdTemplate = await service.create(createTemplateDto);
     expect(createSpy).toHaveBeenCalledTimes(1); // Check if the create method was called
-    expect(createdUser).toEqual(newUser);
+    expect(createdTemplate).toEqual(createTemplateDto);
   });
 });
