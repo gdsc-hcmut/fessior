@@ -13,10 +13,24 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async login(tokenInfo: TokenPayload): Promise<{ accessToken: string }> {
-    const { email, name } = tokenInfo;
+  public async login(tokenInfo: TokenPayload, googleId: string | null): Promise<{ accessToken: string }> {
+    const { email } = tokenInfo;
 
-    const user = await this.usersService.getByEmail(email, name);
+    let user = await this.usersService.getByEmail(email);
+
+    if (!user) {
+      user = await this.usersService.create({
+        firstName: tokenInfo.given_name,
+        lastName: tokenInfo.family_name,
+        picture: tokenInfo.picture,
+        email: tokenInfo.email,
+        dateOfBirth: null,
+        phone: null,
+        googleId,
+        appleId: null,
+        isManager: false,
+      });
+    }
 
     const token = await this.tokensService.createToken(user._id);
 

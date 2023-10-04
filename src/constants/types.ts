@@ -13,5 +13,7 @@ export interface Request extends ERequest {
 
 export interface TokenPayload extends ETokenPayload {
   email: string;
-  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
 }

@@ -50,6 +50,7 @@ import { UsersModule } from './users/users.module';
       // Router for user path
       {
         path: 'api',
+        module: UsersModule,
         children: [
           {
             path: 'templates',
