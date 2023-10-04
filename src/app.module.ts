@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
 import { JwtModule } from './jwt/Jwt.module';
+import { MeModule } from './me/me.module';
 import { TemplatesModule } from './templates/templates.module';
 import { UsersModule } from './users/users.module';
 
@@ -46,15 +47,15 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     CommonModule,
     TemplatesModule,
+    MeModule,
     RouterModule.register([
       // Router for user path
       {
         path: 'api',
-        module: UsersModule,
         children: [
           {
-            path: 'templates',
-            module: TemplatesModule,
+            path: 'me',
+            module: MeModule,
           },
           {
             path: 'auth',
