@@ -19,9 +19,7 @@ jobs:
           cache: 'yarn'
 
       - name: Check commit convention
-        run: |
-          yarn global add commitlint@latest
-          commitlint --from=HEAD~1
+        uses: wagoid/commitlint-github-action@v5
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
