@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -15,21 +15,17 @@ export class UsersService {
     return this.userModel.create(createUserDto);
   }
 
-  public async findAll(): Promise<User[]> {
+  public async getUserProfile(userId: Types.ObjectId): Promise<UserDocument | null> {
+    return this.userModel.findById(userId);
+  }
+
+  public async findAll(limit: number, offset: number): Promise<User[]> {
     this.logger.log('Find all users');
-    return this.userModel.find().exec();
+    return this.userModel.aggregate([{ $limit: limit }, { $skip: offset }]);
   }
 
-  public async findOne(id: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ _id: id }).exec();
-  }
-
-  public async getByEmail(email: string, name: string): Promise<UserDocument> {
-    let user = await this.userModel.findOne({ email });
-    if (!user) {
-      user = await this.userModel.create({ email, name });
-    }
-    return user;
+  public async getByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
   }
 
   public async delete(id: string): Promise<UserDocument | null> {

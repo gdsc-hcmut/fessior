@@ -17,12 +17,13 @@ export class AuthController {
         idToken: token,
         audience: process.env.GOOGLE_CLIENT_ID,
       });
-
+      const googleId = ticket.getUserId();
       const tokenInfo = ticket.getPayload();
+
       if (!tokenInfo || tokenInfo.exp < Date.now() / 1000) {
         throw Error('Token is not valid');
       }
-      const { accessToken } = await this.authService.login(<TokenPayload>tokenInfo);
+      const { accessToken } = await this.authService.login(<TokenPayload>tokenInfo, googleId);
 
       return { payload: accessToken };
     } catch (error) {
