@@ -18,6 +18,11 @@ jobs:
           node-version: 18 # Change this to your desired Node.js version
           cache: 'yarn'
 
+      - name: Check commit convention
+        run: |
+          yarn global add commitlint@latest
+          commitlint --from=HEAD~1
+
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
