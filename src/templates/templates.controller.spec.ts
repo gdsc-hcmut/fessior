@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreateTemplateDto } from './dto/create-template.dto';
@@ -20,6 +21,7 @@ describe('Template Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TemplatesController],
       providers: [
+        { provide: JwtService, useValue: {} },
         {
           provide: TemplatesService,
           useValue: {

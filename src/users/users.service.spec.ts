@@ -5,9 +5,18 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
 
-const mockUser = {
+const mockUser: User = {
   email: 'lygioian@gmail.com',
-  name: 'Ly Gioi An',
+  firstName: 'Gioi An',
+  appleId: 'appleId',
+  googleId: 'googleId',
+  lastName: 'Ly',
+  picture: 'picture',
+  dateOfBirth: 'dateOfBirth',
+  phone: 'phone',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  isManager: false,
 };
 
 describe('UsersService', () => {
@@ -16,12 +25,30 @@ describe('UsersService', () => {
 
   const usersArray = [
     {
-      email: 'lygioian@gmail.com',
-      name: 'Ly Gioi An',
+      email: 'lygioian1@gmail.com',
+      firstName: 'Gioi An',
+      appleId: 'appleId',
+      googleId: 'googleId',
+      lastName: 'Ly',
+      picture: 'picture',
+      dateOfBirth: 'dateOfBirth',
+      phone: 'phone',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isManager: false,
     },
     {
       email: 'lygioian2@gmail.com',
-      name: 'Ly Gioi An2',
+      firstName: 'Gioi An',
+      appleId: 'appleId',
+      googleId: 'googleId',
+      lastName: 'Ly',
+      picture: 'picture',
+      dateOfBirth: 'dateOfBirth',
+      phone: 'phone',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isManager: false,
     },
   ];
 
@@ -39,6 +66,7 @@ describe('UsersService', () => {
             }),
             create: jest.fn().mockImplementation((data: User) => data),
             findAll: jest.fn().mockResolvedValue(usersArray),
+            aggregate: jest.fn().mockResolvedValue(usersArray),
           },
         },
       ],
@@ -53,9 +81,9 @@ describe('UsersService', () => {
   });
 
   it('should return all users', async () => {
-    const findSpy = jest.spyOn(model, 'find');
-    const users = await service.findAll();
-    expect(findSpy).toHaveBeenCalledTimes(1); // Check if the find method was called
+    const spy = jest.spyOn(model, 'aggregate');
+    const users = await service.findAll(0, 1);
+    expect(spy).toHaveBeenCalledTimes(1); // Check if the find method was called
     expect(users).toEqual(usersArray);
   });
 
@@ -63,7 +91,16 @@ describe('UsersService', () => {
     const createSpy = jest.spyOn(model, 'create');
     const newUser: User = {
       email: 'lygioian@gmail.com',
-      name: 'Ly Gioi An',
+      firstName: 'Gioi An',
+      appleId: 'appleId',
+      googleId: 'googleId',
+      lastName: 'Ly',
+      picture: 'picture',
+      dateOfBirth: 'dateOfBirth',
+      phone: 'phone',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isManager: false,
     };
     const createdUser = await service.create(newUser);
     expect(createSpy).toHaveBeenCalledTimes(1); // Check if the create method was called
