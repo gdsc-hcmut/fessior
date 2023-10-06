@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { TokenPayload } from 'src/constants/types';
+import { TokenPayload } from 'google-auth-library';
 
-import { JwtService } from '../jwt/jwt.services';
+import { JwtService } from '../jwt/jwt.service';
 import { TokensService } from '../token/tokens.service';
 import { UsersService } from '../users/users.service';
 
@@ -13,20 +13,24 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async login(tokenInfo: TokenPayload, googleId: string | null): Promise<{ accessToken: string }> {
+  public async login(tokenInfo: TokenPayload, googleId: string): Promise<{ accessToken: string }> {
     const { email } = tokenInfo;
+
+    if (!email) {
+      throw new Error('Could not find email of Token');
+    }
 
     let user = await this.usersService.getByEmail(email);
 
     if (!user) {
       user = await this.usersService.create({
-        firstName: tokenInfo.given_name,
-        lastName: tokenInfo.family_name,
-        picture: tokenInfo.picture,
-        email: tokenInfo.email,
+        firstName: tokenInfo.given_name || null,
+        lastName: tokenInfo.family_name || null,
+        picture: tokenInfo.picture || null,
+        email,
+        googleId,
         dateOfBirth: null,
         phone: null,
-        googleId,
         appleId: null,
         isManager: false,
       });

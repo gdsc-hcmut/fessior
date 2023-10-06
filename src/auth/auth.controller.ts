@@ -1,7 +1,7 @@
 import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { OAuth2Client } from 'google-auth-library';
-import { ControllerResponse, TokenPayload } from 'src/constants/types';
+import { ControllerResponse } from 'src/constants/types';
 
 import { AuthService } from './auth.service';
 
@@ -18,12 +18,17 @@ export class AuthController {
         audience: process.env.GOOGLE_CLIENT_ID,
       });
       const googleId = ticket.getUserId();
+
+      if (googleId == null) {
+        throw Error('Token is not valid');
+      }
+
       const tokenInfo = ticket.getPayload();
 
       if (!tokenInfo || tokenInfo.exp < Date.now() / 1000) {
         throw Error('Token is not valid');
       }
-      const { accessToken } = await this.authService.login(<TokenPayload>tokenInfo, googleId);
+      const { accessToken } = await this.authService.login(tokenInfo, googleId);
 
       return { payload: accessToken };
     } catch (error) {
