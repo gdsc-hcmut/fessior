@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'src/constants/types';
 
-import { JwtService } from '../../jwt/jwt.services';
+import { JwtService } from '../../jwt/jwt.service';
 import { TokensService } from '../../token/tokens.service';
 
 @Injectable()
