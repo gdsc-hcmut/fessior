@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, PipelineStage, Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
+import { SortOptions } from '../constants/types';
 
 @Injectable()
 export class UsersService {
@@ -19,9 +20,32 @@ export class UsersService {
     return this.userModel.findById(userId);
   }
 
-  public async findAll(limit: number, offset: number): Promise<User[]> {
+  public async findAll(
+    limit: number,
+    offset: number,
+    sortOption: SortOptions,
+  ): Promise<{ users: User[]; total: number }> {
     this.logger.log('Find all users');
-    return this.userModel.aggregate([{ $limit: limit }, { $skip: offset }]);
+
+    let sort: any;
+
+    switch (sortOption) {
+      case SortOptions.DATE:
+        sort = { updatedAt: 1 };
+        break;
+      case SortOptions.ASC:
+        sort = { firstName: 1 };
+        break;
+      default:
+        sort = { firstName: -1 };
+        break;
+    }
+    const pipeline: PipelineStage[] | undefined = [{ $limit: limit }, { $skip: offset }, { $sort: sort }];
+
+    const users: User[] = await this.userModel.aggregate(pipeline);
+    const count = await this.userModel.aggregate(pipeline).count('total');
+    const total = count[0].total ?? null;
+    return { users, total };
   }
 
   public async getByEmail(email: string): Promise<UserDocument | null> {

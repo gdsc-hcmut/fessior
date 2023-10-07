@@ -71,6 +71,10 @@ import { UsersModule } from './users/users.module';
             path: 'templates',
             module: TemplatesModule,
           },
+          {
+            path: 'users',
+            module: UsersModule,
+          },
         ],
       },
     ]),
