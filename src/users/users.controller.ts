@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
-import { ControllerResponse, SortOptions } from '../constants/types';
+import { ControllerResponse, SortOption } from '../constants/types';
 
 @ApiTags('users')
 @Controller()
@@ -12,11 +12,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @ApiQuery({ name: 'sort', enum: SortOptions })
+  @ApiQuery({ name: 'sort', enum: SortOption })
   public async getAllUsers(
     @Query('limit') limit: number,
     @Query('offset') offset: number,
-    @Query('sort') sortOption: SortOptions = SortOptions.DESC,
+    @Query('sort') sortOption: SortOption = SortOption.DESC,
   ): Promise<ControllerResponse<{ users: User[]; total: number }>> {
     return { payload: await this.usersService.findAll(limit, offset, sortOption) };
   }

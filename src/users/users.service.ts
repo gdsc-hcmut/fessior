@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, Types } from 'mongoose';
+import { Expression, Model, PipelineStage, Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
-import { SortOptions } from '../constants/types';
+import { SortOption } from '../constants/types';
 
 @Injectable()
 export class UsersService {
@@ -23,17 +23,17 @@ export class UsersService {
   public async findAll(
     limit: number,
     offset: number,
-    sortOption: SortOptions,
+    sortOption: SortOption,
   ): Promise<{ users: User[]; total: number }> {
     this.logger.log('Find all users');
 
-    let sort: any;
+    let sort: Record<string, 1 | -1 | Expression.Meta>;
 
     switch (sortOption) {
-      case SortOptions.DATE:
+      case SortOption.DATE:
         sort = { updatedAt: 1 };
         break;
-      case SortOptions.ASC:
+      case SortOption.ASC:
         sort = { firstName: 1 };
         break;
       default:
