@@ -9,3 +9,9 @@ export type ControllerResponse<T> = {
 export interface Request extends ERequest {
   tokenMeta: { userId: Types.ObjectId };
 }
+
+export enum SortOption {
+  DATE = 'date',
+  DESC = 'desc',
+  ASC = 'asc',
+}

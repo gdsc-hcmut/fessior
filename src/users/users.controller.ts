@@ -1,18 +1,28 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-// import { ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
-import { AuthGuard } from '../common/guards/auth.guard';
-import { ControllerResponse, Request } from '../constants/types';
+import { ControllerResponse, SortOption } from '../constants/types';
 
+@ApiTags('users')
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthGuard)
-  @Get('/me')
-  public async findOne(@Req() req: Request): Promise<ControllerResponse<User | null>> {
-    return { payload: await this.usersService.getUserProfile(req.tokenMeta.userId) };
+  @Get()
+  @ApiQuery({ name: 'sort', enum: SortOption })
+  public async getAllUsers(
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('sort') sortOption: SortOption = SortOption.DESC,
+  ): Promise<ControllerResponse<{ users: User[]; total: number }>> {
+    return { payload: await this.usersService.findAll(limit, offset, sortOption) };
+  }
+
+  @Get(':id')
+  public async getUserById(@Param('id') id: string): Promise<ControllerResponse<{ user: User | null }>> {
+    return { payload: { user: await this.usersService.getUserProfile(new Types.ObjectId(id)) } };
   }
 }

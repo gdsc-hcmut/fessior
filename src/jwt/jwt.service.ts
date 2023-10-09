@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService as EJWtService } from '@nestjs/jwt';
+import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
 
 @Injectable()
 export class JwtService {
-  constructor(private readonly jwtService: EJWtService) {}
+  constructor(private readonly jwtService: NestJwtService) {}
   public async signSync(payload: { tokenId: Types.ObjectId }): Promise<string> {
     return this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET });
   }

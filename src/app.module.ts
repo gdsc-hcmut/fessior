@@ -10,7 +10,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
-import { JwtModule } from './jwt/Jwt.module';
+import { JwtModule } from './jwt/jwt.module';
 import { MeModule } from './me/me.module';
 import { TemplatesModule } from './templates/templates.module';
 import { UsersModule } from './users/users.module';
@@ -70,6 +70,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'templates',
             module: TemplatesModule,
+          },
+          {
+            path: 'users',
+            module: UsersModule,
           },
         ],
       },

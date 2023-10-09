@@ -1,11 +1,12 @@
 import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OAuth2Client } from 'google-auth-library';
 import { ControllerResponse } from 'src/constants/types';
 
 import { AuthService } from './auth.service';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
+@ApiTags('auth')
 @Controller()
 @ApiBearerAuth('access-token')
 export class AuthController {
