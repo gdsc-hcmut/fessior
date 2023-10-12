@@ -17,7 +17,7 @@ jobs:
       - name: Check commit convention
         run: |
           yarn add @commitlint/cli @commitlint/config-conventional -D
-          yarn commitlint --from ${{github.event.pull_request.head.sha}}~${{github.event.pull_request.commits}} --to ${{github.event.pull_request.head.sha}} --verbose
+          yarn commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
   check-files-changed:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
 
       - name: Check files changed
         run: |
-          if [ ${{ github.event.pull_request.changed_files }} -gt 2 ]; then
-            echo "Too many files changed"
+          if [ ${{ github.event.pull_request.changed_files }} -gt 10 ]; then
+            echo "Too many files changed. One PR should only change <= 10 files."
             exit 1
           fi
