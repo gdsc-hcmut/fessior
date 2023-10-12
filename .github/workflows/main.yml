@@ -1,4 +1,4 @@
-name: Unit test
+name: Pipeline
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
           cache: 'yarn'
 
       - name: Check commit convention
-        uses: wagoid/commitlint-github-action@v5
+        uses: npx commitlint --from HEAD~1 --to HEAD --verbose
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
