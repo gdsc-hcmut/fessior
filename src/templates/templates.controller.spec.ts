@@ -1,9 +1,10 @@
-import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { TemplatesController } from './templates.controller';
 import { TemplatesService } from './templates.service';
+import { JwtService } from '../jwt/jwt.services';
+import { TokensService } from '../token/tokens.service';
 
 describe('Template Controller', () => {
   let controller: TemplatesController;
@@ -21,7 +22,21 @@ describe('Template Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TemplatesController],
       providers: [
-        { provide: JwtService, useValue: {} },
+        {
+          provide: JwtService,
+          useValue: {
+            verifyAsync: jest.fn().mockResolvedValue({ tokenId: 'tokenId' }),
+          },
+        },
+        {
+          provide: TokensService,
+          useValue: {
+            checkValidToken: jest.fn().mockResolvedValue(true),
+            getUserByTokenId: jest.fn().mockResolvedValue({
+              _id: 'user id',
+            }),
+          },
+        },
         {
           provide: TemplatesService,
           useValue: {
