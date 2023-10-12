@@ -14,9 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-
       - name: Check commit convention
         run: |
           yarn add @commitlint/cli @commitlint/config-conventional -D
