@@ -33,7 +33,7 @@ jobs:
 
       - name: Check changed files
         run: |
-          if [ ${{ steps.changed-files.outputs.all_modified_files_count }} -gt 2 ]; then
+          if [ ${{ steps.changed-files.outputs.all_modified_files_count }} -gt 15 ]; then
             echo "Too many files changed. One PR should only change <= 15 files."
             exit 1
           fi
