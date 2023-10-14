@@ -39,5 +39,5 @@ jobs:
 
       - name: Lint and format
         run: |
-          yarn eslint ${{ steps.changed-files.outputs.all_modified_files }} --fix
+          yarn eslint ${{ steps.changed-files.outputs.all_modified_files }}
           yarn prettier --write ${{ steps.changed-files.outputs.all_modified_files }}
