@@ -65,7 +65,7 @@ jobs:
           COVERAGE=$(cat coverage/coverage-summary.json | jq -r '.total.branches.pct')
           MIN_THRESHOLD=80
 
-          if (( $(echo "$COVERAGE < $MIN_THRESHOLD" | bc -l) )); then
+          if [ "$COVERAGE" -lt "$MIN_THRESHOLD" ]; then
             echo "Branches coverage $COVERAGE is below the threshold $MIN_THRESHOLD. Aborting the workflow."
             exit 1
           fi
