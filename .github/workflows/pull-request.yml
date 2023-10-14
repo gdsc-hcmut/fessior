@@ -9,7 +9,7 @@ on:
       - dev
 
 jobs:
-  check-changed-files:
+  verify-pull-request:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
