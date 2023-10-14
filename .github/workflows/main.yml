@@ -21,11 +21,27 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: Run Jest tests
+      - name: Run Jest tests and check branches coverage
         run: |
-          yarn test:cov
+          sudo apt-get update
+          sudo apt-get install jq
+
+          yarn test:cov-json-summary
           exit_code=$?
           if [ $exit_code -ne 0 ]; then
            echo "Unit tests failed with exit code $exit_code. Stopping the workflow."
            exit $exit_code
           fi
+
+          COVERAGE=$(cat coverage/coverage-summary.json | jq -r '.total.branches.pct')
+          MIN_THRESHOLD=80
+
+          if (( $(echo "$COVERAGE < $MIN_THRESHOLD" | bc -l) )); then
+            echo "Jest coverage is below the threshold. Aborting the workflow."
+            exit 1
+          fi
+        env:
+          CI: true
+        continue-on-error: true
+
+          
