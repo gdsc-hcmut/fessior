@@ -3,7 +3,7 @@ name: Main
 on:
   push:
     branches:
-      - chore/setup-test # Change this to your main branch name
+      - chore/setup-test # change to main later
 
 jobs:
   build-and-test:
@@ -23,12 +23,9 @@ jobs:
 
       - name: Run Jest tests
         run: |
-          yarn test
+          yarn test:cov
           exit_code=$?
           if [ $exit_code -ne 0 ]; then
            echo "Unit tests failed with exit code $exit_code. Stopping the workflow."
            exit $exit_code
           fi
-
-      - name: Build resources
-        run: echo "Build resources..."
