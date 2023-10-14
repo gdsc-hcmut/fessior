@@ -5,9 +5,6 @@ export type TemplateDocument = HydratedDocument<Template>;
 
 @Schema()
 export class Template {
-  @Prop({ required: true })
-  public email: string;
-
   @Prop()
   public name: string;
 }

@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
+import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { JwtModule } from './jwt/jwt.module';
 import { MeModule } from './me/me.module';
 import { TemplatesModule } from './templates/templates.module';
@@ -48,6 +49,7 @@ import { UsersModule } from './users/users.module';
     CommonModule,
     TemplatesModule,
     MeModule,
+    FeatureFlagsModule,
     RouterModule.register([
       // Router for user path
       {
