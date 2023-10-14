@@ -34,9 +34,6 @@ jobs:
             exit 1
           fi
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-
       - name: Lint check
         run: |
           yarn eslint ${{ steps.changed-files.outputs.all_modified_files }}
