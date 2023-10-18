@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Expression, Model, PipelineStage, Types } from 'mongoose';
+import { Expression, Model, Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -40,11 +40,9 @@ export class UsersService {
         sort = { firstName: -1 };
         break;
     }
-    const pipeline: PipelineStage[] | undefined = [{ $limit: limit }, { $skip: offset }, { $sort: sort }];
 
-    const users: User[] = await this.userModel.aggregate(pipeline);
-    const count = await this.userModel.aggregate(pipeline).count('total');
-    const total = count[0].total ?? null;
+    const users: User[] = await this.userModel.find().sort(sort).skip(offset).limit(limit);
+    const total = users.length;
     return { users, total };
   }
 
