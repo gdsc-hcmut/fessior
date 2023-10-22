@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { FeatureFlagsController } from './feature-flags.controller';
 import { FeatureFlagsService } from './feature-flags.service';
+import { JwtService } from '../jwt/jwt.service';
+import { TokensService } from '../token/tokens.service';
 
 describe('FeatureFlagsController', () => {
   let controller: FeatureFlagsController;
@@ -35,6 +37,21 @@ describe('FeatureFlagsController', () => {
             findAll: jest.fn().mockResolvedValue(mockFeatureFlags),
           },
         },
+        {
+          provide: TokensService,
+          useValue: {
+            checkValidToken: jest.fn().mockResolvedValue(true),
+            getUserByTokenId: jest.fn().mockResolvedValue({
+              _id: 'user id',
+            }),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            verifyAsync: jest.fn().mockResolvedValue({ tokenId: 'tokenId' }),
+          },
+        },
       ],
     }).compile();
 
@@ -50,7 +67,7 @@ describe('FeatureFlagsController', () => {
     it('should return list of feature flags', async () => {
       const spy = jest.spyOn(service, 'findAll');
       const flags = await controller.findAll();
-      expect(flags).toBe(mockFeatureFlags);
+      expect(flags).toEqual({ payload: mockFeatureFlags });
       expect(spy).toHaveBeenCalledTimes(1);
     });
   });

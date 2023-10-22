@@ -13,6 +13,7 @@ import { CoreModule } from './core/core.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { JwtModule } from './jwt/jwt.module';
 import { MeModule } from './me/me.module';
+import { TargetGroupsModule } from './target-groups/target-groups.module';
 import { TemplatesModule } from './templates/templates.module';
 import { UsersModule } from './users/users.module';
 
@@ -50,6 +51,7 @@ import { UsersModule } from './users/users.module';
     TemplatesModule,
     MeModule,
     FeatureFlagsModule,
+    TargetGroupsModule,
     RouterModule.register([
       // Router for user path
       {
@@ -76,6 +78,14 @@ import { UsersModule } from './users/users.module';
           {
             path: 'users',
             module: UsersModule,
+          },
+          {
+            path: 'feature-flags',
+            module: FeatureFlagsModule,
+          },
+          {
+            path: 'target-groups',
+            module: TargetGroupsModule,
           },
         ],
       },
