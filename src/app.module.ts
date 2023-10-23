@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
 
+import { AccessLevelModule } from './access-levels/access-level.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -45,6 +46,7 @@ import { UsersModule } from './users/users.module';
     CoreModule,
     JwtModule,
     AuthModule,
+    AccessLevelModule,
     UsersModule,
     CommonModule,
     TemplatesModule,
@@ -76,6 +78,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'users',
             module: UsersModule,
+          },
+          {
+            path: 'access-levels',
+            module: AccessLevelModule,
           },
         ],
       },
