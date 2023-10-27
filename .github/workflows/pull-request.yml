@@ -41,6 +41,8 @@ jobs:
           if [ ${{ github.actor }} == "tomgermanyyyy" ]; then
             echo "Bypass check changed files for tomgermanyyyy"
             exit 0
+          fi
+
           if [ ${{ steps.changed-files.outputs.all_modified_files_count }} -gt 15 ]; then
             echo "Too many files changed. One PR should only change <= 15 files."
             exit 1
