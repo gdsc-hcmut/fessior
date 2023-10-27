@@ -5,8 +5,10 @@ import { ObjectIdValidationPipe } from 'src/common/pipes';
 
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
+import { Flag } from '../common/decorators/flags.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
-import { ControllerResponse, SortOption } from '../constants/types';
+import { FeatureFlagGuard } from '../common/guards/feature-flag.guard';
+import { ControllerResponse, FlagName, SortOption } from '../constants/types';
 
 @ApiTags('users')
 @UseGuards(AuthGuard)
@@ -16,6 +18,8 @@ export class UsersController {
 
   @Get()
   @ApiQuery({ name: 'sort', enum: SortOption })
+  @Flag(FlagName.GET_ALL_USERS)
+  @UseGuards(FeatureFlagGuard)
   public async getAllUsers(
     @Query('limit') limit: number,
     @Query('offset') offset: number,
@@ -25,6 +29,8 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Flag(FlagName.GET_USER_BY_ID)
+  @UseGuards(FeatureFlagGuard)
   public async getUserById(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<ControllerResponse<{ user: User | null }>> {

@@ -14,9 +14,13 @@ export class AllExceptionFilter implements ExceptionFilter {
       responseBody = exception.getResponse();
       statusCode = exception.getStatus();
     } else if (exception instanceof Error) {
+      const { name, message } = exception;
+      if (name === 'ValidationError') {
+        statusCode = HttpStatus.BAD_REQUEST;
+      }
       responseBody = {
         statusCode,
-        message: exception.stack,
+        message,
       };
     }
 

@@ -15,3 +15,15 @@ export enum SortOption {
   DESC = 'desc',
   ASC = 'asc',
 }
+
+export enum Platform {
+  WEB = 'web',
+  IOS = 'ios',
+  ANDROID = 'android',
+}
+
+export enum FlagName {
+  GET_ME = 'GET_ME',
+  GET_ALL_USERS = 'GET_ALL_USERS',
+  GET_USER_BY_ID = 'GET_USER_BY_ID',
+}

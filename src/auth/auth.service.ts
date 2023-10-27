@@ -40,7 +40,7 @@ export class AuthService {
 
     const payload = { tokenId: token._id };
 
-    return { accessToken: await this.jwtService.signSync(payload) };
+    return { accessToken: await this.jwtService.signAsync(payload) };
   }
 
   public async logout(accessToken: string): Promise<void> {

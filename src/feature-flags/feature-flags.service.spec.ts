@@ -1,6 +1,6 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { FeatureFlagsService } from './feature-flags.service';
@@ -28,9 +28,13 @@ describe('FeatureFlagsService', () => {
     },
   ];
   const createFeatureFlagDto: CreateFeatureFlagDto = {
-    name: 'feature flag 1',
     key: 'ff1',
     description: 'desc',
+    targetGroups: [],
+    platforms: [],
+    isEnabled: true,
+    createdBy: new Types.ObjectId(),
+    updatedBy: new Types.ObjectId(),
   };
 
   beforeEach(async () => {

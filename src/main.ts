@@ -8,6 +8,7 @@ import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
+import { AllExceptionFilter } from './filter/exception.filter';
 
 // TODO enhance this better with ts
 declare const module: any;
@@ -21,6 +22,8 @@ async function bootstrap(): Promise<string> {
 
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
+
+  app.useGlobalFilters(new AllExceptionFilter(app.get(Logger)));
 
   app.useGlobalPipes(new ValidationPipe());
 

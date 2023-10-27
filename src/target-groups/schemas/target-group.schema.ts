@@ -14,10 +14,10 @@ export class TargetGroup {
   @Prop({ require: true, ref: 'Organization' })
   public organizations: ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   public createdBy: ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   public updatedBy: ObjectId;
 }
 

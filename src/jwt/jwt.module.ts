@@ -7,7 +7,8 @@ import { JwtService } from './jwt.service';
 @Module({
   imports: [
     NestJwtModule.register({
-      signOptions: { expiresIn: '31536000' },
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '365d' },
     }),
   ],
   providers: [JwtService],
