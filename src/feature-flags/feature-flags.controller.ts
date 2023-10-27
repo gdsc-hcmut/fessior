@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ControllerResponse } from 'src/constants/types';
+import { ControllerResponse, Request } from 'src/constants/types';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
+import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
 import { FeatureFlagsService } from './feature-flags.service';
 import { FeatureFlag } from './schemas/feature-flag.schema';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -15,8 +16,13 @@ export class FeatureFlagsController {
   constructor(private readonly featureFlagsService: FeatureFlagsService) {}
 
   @Post()
-  public async create(@Body() createFeatureFlagDto: CreateFeatureFlagDto): Promise<ControllerResponse<FeatureFlag>> {
-    const newFeatureFlag = await this.featureFlagsService.create(createFeatureFlagDto);
+  public async create(
+    @Req() req: Request,
+    @Body() dto: CreateFeatureFlagDto,
+  ): Promise<ControllerResponse<FeatureFlag>> {
+    dto.createdBy = req.tokenMeta.userId;
+    dto.updatedBy = req.tokenMeta.userId;
+    const newFeatureFlag = await this.featureFlagsService.create(dto);
     return { payload: newFeatureFlag };
   }
 
@@ -32,6 +38,17 @@ export class FeatureFlagsController {
   ): Promise<ControllerResponse<FeatureFlag | null>> {
     const featureFlag = await this.featureFlagsService.findOne(id);
     return { payload: featureFlag };
+  }
+
+  @Patch(':id')
+  public async update(
+    @Req() req: Request,
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Body() dto: UpdateFeatureFlagDto,
+  ): Promise<ControllerResponse<FeatureFlag | null>> {
+    dto.updatedBy = req.tokenMeta.userId;
+
+    return { payload: await this.featureFlagsService.updateOne(id, dto) };
   }
 
   @Delete(':id')

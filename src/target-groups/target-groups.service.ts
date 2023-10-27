@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
@@ -8,8 +8,6 @@ import { TargetGroup } from './schemas/target-group.schema';
 
 @Injectable()
 export class TargetGroupsService {
-  private readonly logger: Logger = new Logger(TargetGroupsService.name);
-
   constructor(@InjectModel('TargetGroup') private readonly targetGroupModel: Model<TargetGroup>) {}
 
   public async create(createTargetGroupDto: CreateTargetGroupDto): Promise<TargetGroup> {
