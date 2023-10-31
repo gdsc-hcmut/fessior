@@ -27,3 +27,9 @@ export enum FlagName {
   GET_ALL_USERS = 'GET_ALL_USERS',
   GET_USER_BY_ID = 'GET_USER_BY_ID',
 }
+
+export enum Permission {
+  READ_ALL_USERS = 'READ_ALL_USERS',
+  READ_USER_BY_ID = 'READ_USER_BY_ID',
+  DELETE_USER_BY_ID = 'DELETE_USER_BY_ID',
+}

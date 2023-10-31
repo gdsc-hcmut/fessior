@@ -34,7 +34,7 @@ export class UsersController {
   public async getUserById(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<ControllerResponse<{ user: User | null }>> {
-    const user = await this.usersService.getUserProfile(new Types.ObjectId(id));
+    const user = await this.usersService.findById(new Types.ObjectId(id));
     if (!user) {
       throw new NotFoundException('User not found');
     }

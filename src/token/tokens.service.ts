@@ -24,7 +24,7 @@ export class TokensService {
       throw new HttpException('The token does not exist', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.usersService.getUserProfile(token.userId);
+    return this.usersService.findById(token.userId);
   }
 
   public async deactivateToken(tokenId: string): Promise<TokenDocument> {

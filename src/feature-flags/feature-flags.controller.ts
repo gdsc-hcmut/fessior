@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch, NotFoundException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ControllerResponse, Request } from 'src/constants/types';
 
@@ -37,6 +37,10 @@ export class FeatureFlagsController {
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<ControllerResponse<FeatureFlag | null>> {
     const featureFlag = await this.featureFlagsService.findOne(id);
+    if (!featureFlag) {
+      throw new NotFoundException('Feature flag not found');
+    }
+
     return { payload: featureFlag };
   }
 
@@ -47,8 +51,12 @@ export class FeatureFlagsController {
     @Body() dto: UpdateFeatureFlagDto,
   ): Promise<ControllerResponse<FeatureFlag | null>> {
     dto.updatedBy = req.tokenMeta.userId;
+    const updatedFeatureFlag = await this.featureFlagsService.updateOne(id, dto);
+    if (!updatedFeatureFlag) {
+      throw new NotFoundException('Feature flag not found');
+    }
 
-    return { payload: await this.featureFlagsService.updateOne(id, dto) };
+    return { payload: updatedFeatureFlag };
   }
 
   @Delete(':id')
@@ -56,6 +64,10 @@ export class FeatureFlagsController {
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<ControllerResponse<FeatureFlag | null>> {
     const deletedFeatureFlag = await this.featureFlagsService.delete(id);
+    if (!deletedFeatureFlag) {
+      throw new NotFoundException('Feature flag not found');
+    }
+
     return { payload: deletedFeatureFlag };
   }
 }

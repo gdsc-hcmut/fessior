@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
 
+import { AccessLevelsModule } from './access-levels/access-levels.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -52,6 +53,7 @@ import { UsersModule } from './users/users.module';
     MeModule,
     FeatureFlagsModule,
     TargetGroupsModule,
+    AccessLevelsModule,
     RouterModule.register([
       // Router for user path
       {
@@ -86,6 +88,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'target-groups',
             module: TargetGroupsModule,
+          },
+          {
+            path: 'access-levels',
+            module: AccessLevelsModule,
           },
         ],
       },

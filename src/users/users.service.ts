@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Expression, Model, Types } from 'mongoose';
+import { Expression, Model, ObjectId, Types } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -16,8 +16,12 @@ export class UsersService {
     return this.userModel.create(createUserDto);
   }
 
-  public async getUserProfile(userId: Types.ObjectId): Promise<UserDocument | null> {
+  public async findById(userId: Types.ObjectId): Promise<UserDocument | null> {
     return this.userModel.findById(userId);
+  }
+
+  public async findMany(ids: string[]): Promise<{ _id: ObjectId }[]> {
+    return this.userModel.find({ _id: { $in: ids } }, '_id');
   }
 
   public async findAll(
