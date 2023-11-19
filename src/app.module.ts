@@ -14,6 +14,7 @@ import { CoreModule } from './core/core.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { JwtModule } from './jwt/jwt.module';
 import { MeModule } from './me/me.module';
+import { OrganizationsModule } from './organization/organizations.module';
 import { TargetGroupsModule } from './target-groups/target-groups.module';
 import { TemplatesModule } from './templates/templates.module';
 import { UsersModule } from './users/users.module';
@@ -54,6 +55,7 @@ import { UsersModule } from './users/users.module';
     FeatureFlagsModule,
     TargetGroupsModule,
     AccessLevelsModule,
+    OrganizationsModule,
     RouterModule.register([
       // Router for user path
       {
@@ -92,6 +94,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'access-levels',
             module: AccessLevelsModule,
+          },
+          {
+            path: 'organizations',
+            module: OrganizationsModule,
           },
         ],
       },
