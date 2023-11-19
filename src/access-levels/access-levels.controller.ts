@@ -59,7 +59,7 @@ export class AccessLevelsController {
     return { payload: updatedAccessLevel };
   }
 
-  @Patch(':id/users/grant')
+  @Patch(':id/grant')
   public async grantToUsers(
     @Req() req: Request,
     @Param('id', ObjectIdValidationPipe) id: string,
@@ -67,10 +67,10 @@ export class AccessLevelsController {
   ): Promise<ControllerResponse<AccessLevel | null>> {
     dto.updatedBy = req.tokenMeta.userId;
 
-    return { payload: await this.accessLevelsService.grantToUsers(dto.users, id) };
+    return { payload: await this.accessLevelsService.grantToUsers(dto.users, dto.permissions, id) };
   }
 
-  @Patch(':id/users/revoke')
+  @Patch(':id/revoke')
   public async revokeUsers(
     @Req() req: Request,
     @Param('id', ObjectIdValidationPipe) id: string,
@@ -78,7 +78,7 @@ export class AccessLevelsController {
   ): Promise<ControllerResponse<AccessLevel | null>> {
     dto.updatedBy = req.tokenMeta.userId;
 
-    return { payload: await this.accessLevelsService.revokeUsers(dto.users, id) };
+    return { payload: await this.accessLevelsService.revokeUsers(dto.users, dto.permissions, id) };
   }
 
   @Delete(':id')
