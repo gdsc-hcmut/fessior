@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Permission } from 'src/constants/types';
 
 import { CreateAccessLevelDto } from './dto/create-access-level.dto';
 import { UpdateAccessLevelDto } from './dto/update-access-level.dto';
@@ -44,14 +45,18 @@ export class AccessLevelsService {
     return this.accessLevelModel.findByIdAndUpdate(
       id,
       {
-        $set: { name, updatedBy, users },
-        $addToSet: { permissions: { $each: permissions } },
+        $set: { name, updatedBy },
+        $addToSet: { permissions: { $each: permissions }, users: { $each: users } },
       },
       { new: true },
     );
   }
 
-  public async grantToUsers(userIds: string[], accessLevelId: string): Promise<AccessLevel | null> {
+  public async grantToUsers(
+    userIds: string[],
+    permissions: Permission[],
+    accessLevelId: string,
+  ): Promise<AccessLevel | null> {
     const accessLevel = await this.accessLevelModel.findById(accessLevelId);
     if (!accessLevel) {
       throw new NotFoundException('Access level not found');
@@ -65,24 +70,26 @@ export class AccessLevelsService {
     const ids = users.map(user => user._id);
     return this.accessLevelModel.findByIdAndUpdate(
       accessLevelId,
-      { $addToSet: { users: { $each: ids } } },
+      { $addToSet: { users: { $each: ids }, permissions: { $each: permissions } } },
       { new: true },
     );
   }
 
-  public async revokeUsers(userIds: string[], accessLevelId: string): Promise<AccessLevel | null> {
+  public async revokeUsers(
+    userIds: string[],
+    permissions: Permission[],
+    accessLevelId: string,
+  ): Promise<AccessLevel | null> {
     const accessLevel = await this.accessLevelModel.findById(accessLevelId);
     if (!accessLevel) {
       throw new NotFoundException('Access level not found');
     }
 
-    const users = await this.usersService.findMany(userIds);
-    if (users.length === 0) {
-      throw new BadRequestException('No user exists');
-    }
-
-    const ids = users.map(user => user._id);
-    return this.accessLevelModel.findByIdAndUpdate(accessLevelId, { $pull: { users: { $in: ids } } }, { new: true });
+    return this.accessLevelModel.findByIdAndUpdate(
+      accessLevelId,
+      { $pull: { users: { $in: userIds }, permissions: { $in: permissions } } },
+      { new: true },
+    );
   }
 
   public async delete(id: string): Promise<AccessLevel | null> {
