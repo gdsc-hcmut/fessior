@@ -17,6 +17,7 @@ import { MeModule } from './me/me.module';
 import { OrganizationsModule } from './organization/organizations.module';
 import { TargetGroupsModule } from './target-groups/target-groups.module';
 import { TemplatesModule } from './templates/templates.module';
+import { UrlsModule } from './urls/urls.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -52,6 +53,7 @@ import { UsersModule } from './users/users.module';
     CommonModule,
     TemplatesModule,
     MeModule,
+    UrlsModule,
     FeatureFlagsModule,
     TargetGroupsModule,
     AccessLevelsModule,
@@ -69,6 +71,7 @@ import { UsersModule } from './users/users.module';
             path: 'auth',
             module: AuthModule,
           },
+          { path: 'urls', module: UrlsModule },
         ],
       },
       // Router for admin path

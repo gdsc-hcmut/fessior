@@ -43,7 +43,7 @@
     "google-auth-library": "^9.0.0",
     "helmet": "^7.0.0",
     "mongoose": "^7.4.0",
-    "nanoid": "^4.0.2",
+    "nanoid": "3.2.0",
     "nestjs-pino": "^3.3.0",
     "passport": "^0.6.0",
     "pino": "^8.14.1",
