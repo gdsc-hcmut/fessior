@@ -9,6 +9,7 @@ export class CreateUrlDto {
   @IsNotEmpty()
   public readonly slug: string;
 
+  @IsOptional()
   @IsString()
   public readonly domain: string;
 
