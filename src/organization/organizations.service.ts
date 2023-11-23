@@ -35,6 +35,10 @@ export class OrganizationsService {
       .limit(limit);
   }
 
+  public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
+    return this.organizationModel.find({ managers: { $in: [userId] } });
+  }
+
   public async findOne(id: string): Promise<Organization | null> {
     return this.organizationModel.findById(id);
   }

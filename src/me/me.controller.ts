@@ -6,6 +6,8 @@ import { Flag } from '../common/decorators/flags.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { FeatureFlagGuard } from '../common/guards/feature-flag.guard';
 import { ControllerResponse, FlagName, Request } from '../constants/types';
+import { OrganizationsService } from '../organization/organizations.service';
+import { Organization } from '../organization/schemas/organization.schema';
 import { User } from '../users/schemas/user.schema';
 
 @ApiTags('me')
@@ -13,10 +15,17 @@ import { User } from '../users/schemas/user.schema';
 @UseGuards(AuthGuard, FeatureFlagGuard)
 @Controller()
 export class MeController {
-  constructor(public readonly meService: MeService) {}
+  constructor(public readonly meService: MeService, public readonly organizationsService: OrganizationsService) {}
 
   @Get()
   public async getProfile(@Req() req: Request): Promise<ControllerResponse<User | null>> {
     return { payload: await this.meService.getProfile(req.tokenMeta.userId) };
+  }
+
+  @Get('organizations')
+  public async getOrganizations(@Req() req: Request): Promise<ControllerResponse<Organization[]>> {
+    const { userId } = req.tokenMeta;
+
+    return { payload: await this.organizationsService.getOrganizationsByUserId(userId.toString()) };
   }
 }
