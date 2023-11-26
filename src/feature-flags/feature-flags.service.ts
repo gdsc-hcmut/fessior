@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, PopulateOptions } from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
@@ -8,6 +8,10 @@ import { FeatureFlag } from './schemas/feature-flag.schema';
 import { TargetGroup } from '../target-groups/schemas/target-group.schema';
 
 type FeatureFlagPopulated = Omit<FeatureFlag, 'targetGroups'> & { targetGroups: TargetGroup[] };
+
+type TargetGroupsPopulated = {
+  targetGroups: { _id: string; users: string[]; organizations: { managers: string[] }[] }[];
+};
 
 @Injectable()
 export class FeatureFlagsService {
@@ -38,6 +42,50 @@ export class FeatureFlagsService {
 
   public async findOne(id: string): Promise<FeatureFlag | null> {
     return this.featureFlagModel.findById(id);
+  }
+
+  public async getUserFeatureFlags(userId: string): Promise<{ [key in string]: boolean }> {
+    const res: { [key in string]: boolean } = {};
+    const populateOptions: PopulateOptions = {
+      path: 'targetGroups',
+      select: '_id users organizations',
+      populate: {
+        path: 'organizations',
+        select: 'managers',
+      },
+    };
+    const featureFlags = await this.featureFlagModel.find().populate<TargetGroupsPopulated>(populateOptions);
+
+    featureFlags.forEach(ff => {
+      res[ff.key] = false;
+    });
+
+    // TODO: Cache userId -> { [ff in string]: boolean }
+    for (let i = 0; i < featureFlags.length; i += 1) {
+      const ff = featureFlags[i];
+      if (!ff.isEnabled) {
+        res[ff.key] = true;
+        continue;
+      }
+      for (let j = 0; j < ff.targetGroups.length; j += 1) {
+        const group = ff.targetGroups[i];
+        if (group.users.includes(userId)) {
+          res[ff.key] = true;
+          break;
+        }
+        for (let k = 0; k < group.organizations.length; k += 1) {
+          const org = group.organizations[k];
+          if (org.managers.includes(userId)) {
+            res[ff.key] = true;
+            break;
+          }
+        }
+        if (res[ff.key]) {
+          break;
+        }
+      }
+    }
+    return res;
   }
 
   public async findByKeyAndPopulate(key: string): Promise<FeatureFlagPopulated | null> {

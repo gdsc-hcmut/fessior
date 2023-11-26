@@ -36,6 +36,7 @@ export class OrganizationsService {
   }
 
   public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
+    // TODO: cache userId -> organizations
     return this.organizationModel.find({ managers: { $in: [userId] } });
   }
 

@@ -6,6 +6,7 @@ import { Flag } from '../common/decorators/flags.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { FeatureFlagGuard } from '../common/guards/feature-flag.guard';
 import { ControllerResponse, FlagName, Request } from '../constants/types';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { OrganizationsService } from '../organization/organizations.service';
 import { Organization } from '../organization/schemas/organization.schema';
 import { User } from '../users/schemas/user.schema';
@@ -15,7 +16,11 @@ import { User } from '../users/schemas/user.schema';
 @UseGuards(AuthGuard, FeatureFlagGuard)
 @Controller()
 export class MeController {
-  constructor(public readonly meService: MeService, public readonly organizationsService: OrganizationsService) {}
+  constructor(
+    public readonly meService: MeService,
+    public readonly organizationsService: OrganizationsService,
+    public readonly featureFlagsService: FeatureFlagsService,
+  ) {}
 
   @Get()
   public async getProfile(@Req() req: Request): Promise<ControllerResponse<User | null>> {
@@ -27,5 +32,12 @@ export class MeController {
     const { userId } = req.tokenMeta;
 
     return { payload: await this.organizationsService.getOrganizationsByUserId(userId.toString()) };
+  }
+
+  @Get('feature-flags')
+  public async getFeatureFlags(@Req() req: Request): Promise<ControllerResponse<{ [key in string]: boolean }>> {
+    const { userId } = req.tokenMeta;
+
+    return { payload: await this.featureFlagsService.getUserFeatureFlags(userId.toString()) };
   }
 }
