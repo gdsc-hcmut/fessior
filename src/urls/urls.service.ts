@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { customAlphabet } from 'nanoid';
 import { ALPHABET, DEFAULT_DOMAIN, SLUG_REGEX } from 'src/constants';
+import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
 import { Url } from './schemas/url.schema';
@@ -58,5 +59,16 @@ export class UrlsService {
     url = await this.urlModel.create({ originalUrl, slug: slug || nanoid(), domain, createdBy, updatedBy });
 
     return url;
+  }
+
+  public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
+    const url = await this.urlModel.findOne({ slug, domain });
+    if (!url) {
+      throw new NotFoundException('URL not found!');
+    }
+
+    url.totalClicks.push({ clickedAt: new Date(), origin: getOrigin(referer), ip: '' });
+    await url.save();
+    return url.originalUrl;
   }
 }
