@@ -33,3 +33,21 @@ export enum Permission {
   READ_USER_BY_ID = 'READ_USER_BY_ID',
   DELETE_USER_BY_ID = 'DELETE_USER_BY_ID',
 }
+
+export enum Origin {
+  MESSENGER = 'Messenger',
+  FACEBOOK = 'Facebook',
+  INSTAGRAM = 'Instagram',
+  TWITTER = 'Twitter',
+  LINKEDIN = 'Linkedin',
+  YOUTUBE = 'Youtube',
+}
+
+export enum Referer {
+  MESSENGER = 'https://l.messenger.com/',
+  FACEBOOK = 'https://l.facebook.com/',
+  INSTAGRAM = 'https://l.instagram.com/',
+  TWITTER = 'https://t.co/',
+  LINKEDIN = 'https://www.linkedin.com/',
+  YOUTUBE = 'https://www.youtube.com/',
+}

@@ -10,5 +10,6 @@ import { OrganizationsModule } from '../organization/organizations.module';
   imports: [MongooseModule.forFeature([{ name: Url.name, schema: UrlSchema }]), OrganizationsModule],
   controllers: [UrlsController],
   providers: [UrlsService],
+  exports: [UrlsService],
 })
 export class UrlsModule {}
