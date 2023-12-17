@@ -1,5 +1,7 @@
 import { IsBoolean, IsEmail } from 'class-validator';
 
+import { UserDocument } from '../schemas/user.schema';
+
 export class CreateUserDto {
   @IsEmail()
   public readonly email: string;
@@ -21,3 +23,7 @@ export class CreateUserDto {
 
   public readonly phone: string | null;
 }
+
+export type UserResponse = UserDocument & {
+  readonly isPartner: boolean;
+};

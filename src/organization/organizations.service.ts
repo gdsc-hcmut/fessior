@@ -40,6 +40,12 @@ export class OrganizationsService {
     return this.organizationModel.find({ managers: { $in: [userId] } });
   }
 
+  public async isPartner(userId: string): Promise<boolean> {
+    const organization = await this.organizationModel.findOne({ managers: { $in: [userId] } });
+
+    return !!organization;
+  }
+
   public async findOne(id: string): Promise<Organization | null> {
     return this.organizationModel.findById(id);
   }

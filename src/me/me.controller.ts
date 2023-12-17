@@ -9,7 +9,7 @@ import { ControllerResponse, FlagName, Request } from '../constants/types';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { OrganizationsService } from '../organization/organizations.service';
 import { Organization } from '../organization/schemas/organization.schema';
-import { User } from '../users/schemas/user.schema';
+import { UserResponse } from '../users/dto/create-user.dto';
 
 @ApiTags('me')
 @Flag(FlagName.GET_ME)
@@ -23,8 +23,28 @@ export class MeController {
   ) {}
 
   @Get()
-  public async getProfile(@Req() req: Request): Promise<ControllerResponse<User | null>> {
-    return { payload: await this.meService.getProfile(req.tokenMeta.userId) };
+  public async getProfile(@Req() req: Request): Promise<ControllerResponse<UserResponse | null>> {
+    const { userId } = req.tokenMeta;
+    const profile = await this.meService.getProfile(userId);
+    if (!profile) return { payload: null };
+
+    const userResponse: UserResponse = {
+      _id: userId,
+      email: profile.email,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      appleId: profile.appleId,
+      dateOfBirth: profile.dateOfBirth,
+      googleId: profile.googleId,
+      isManager: profile.isManager,
+      phone: profile.phone,
+      picture: profile.picture,
+      isPartner: await this.organizationsService.isPartner(userId.toString()),
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
+    };
+
+    return { payload: userResponse };
   }
 
   @Get('organizations')
