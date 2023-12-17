@@ -67,7 +67,7 @@ export class AccessLevelsController {
   ): Promise<ControllerResponse<AccessLevel | null>> {
     dto.updatedBy = req.tokenMeta.userId;
 
-    return { payload: await this.accessLevelsService.grantToUsers(dto.users, dto.permissions, id) };
+    return { payload: await this.accessLevelsService.grantPermissionsToUsers(dto.users, dto.permissions, id) };
   }
 
   @Patch(':id/revoke')
@@ -78,7 +78,7 @@ export class AccessLevelsController {
   ): Promise<ControllerResponse<AccessLevel | null>> {
     dto.updatedBy = req.tokenMeta.userId;
 
-    return { payload: await this.accessLevelsService.revokeUsers(dto.users, dto.permissions, id) };
+    return { payload: await this.accessLevelsService.revokeUsersAndPermission(dto.users, dto.permissions, id) };
   }
 
   @Delete(':id')

@@ -6,16 +6,12 @@ import { Permission } from 'src/constants/types';
 import { CreateAccessLevelDto } from './dto/create-access-level.dto';
 import { UpdateAccessLevelDto } from './dto/update-access-level.dto';
 import { AccessLevel } from './schemas/access-level.schema';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AccessLevelsService {
   private readonly logger: Logger = new Logger(AccessLevelsService.name);
 
-  constructor(
-    @InjectModel(AccessLevel.name) private readonly accessLevelModel: Model<AccessLevel>,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(@InjectModel(AccessLevel.name) private readonly accessLevelModel: Model<AccessLevel>) {}
 
   public async create(dto: CreateAccessLevelDto): Promise<AccessLevel> {
     const { name } = dto;
@@ -35,6 +31,7 @@ export class AccessLevelsService {
     return this.accessLevelModel.findById(id);
   }
 
+  // just simply add more users and permissions
   public async updateOne(id: string, dto: UpdateAccessLevelDto): Promise<AccessLevel | null> {
     const accessLevel = await this.accessLevelModel.findById(id);
     if (!accessLevel) {
@@ -52,7 +49,8 @@ export class AccessLevelsService {
     );
   }
 
-  public async grantToUsers(
+  // grant more users and permissions
+  public async grantPermissionsToUsers(
     userIds: string[],
     permissions: Permission[],
     accessLevelId: string,
@@ -62,20 +60,15 @@ export class AccessLevelsService {
       throw new NotFoundException('Access level not found');
     }
 
-    const users = await this.usersService.findMany(userIds);
-    if (users.length === 0) {
-      throw new BadRequestException('No user exists');
-    }
-
-    const ids = users.map(user => user._id);
     return this.accessLevelModel.findByIdAndUpdate(
       accessLevelId,
-      { $addToSet: { users: { $each: ids }, permissions: { $each: permissions } } },
+      { $addToSet: { users: { $each: userIds }, permissions: { $each: permissions } } },
       { new: true },
     );
   }
 
-  public async revokeUsers(
+  // revoke users and permissions
+  public async revokeUsersAndPermission(
     userIds: string[],
     permissions: Permission[],
     accessLevelId: string,
