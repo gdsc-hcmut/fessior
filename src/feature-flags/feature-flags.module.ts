@@ -9,5 +9,6 @@ import { FeatureFlag, FeatureFlagSchema } from './schemas/feature-flag.schema';
   imports: [MongooseModule.forFeature([{ name: FeatureFlag.name, schema: FeatureFlagSchema }])],
   controllers: [FeatureFlagsController],
   providers: [FeatureFlagsService],
+  exports: [FeatureFlagsService],
 })
 export class FeatureFlagsModule {}

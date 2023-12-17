@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, PopulateOptions } from 'mongoose';
+import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, QueryOptions, UpdateWriteOpResult } from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
-import { FeatureFlag } from './schemas/feature-flag.schema';
+import { FeatureFlag, FeatureFlagDocument } from './schemas/feature-flag.schema';
 import { TargetGroup } from '../target-groups/schemas/target-group.schema';
 
 type FeatureFlagPopulated = Omit<FeatureFlag, 'targetGroups'> & { targetGroups: TargetGroup[] };
@@ -107,7 +107,29 @@ export class FeatureFlagsService {
     return this.featureFlagModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
+  public async updateMany(
+    filter: FilterQuery<FeatureFlagDocument>,
+    update: UpdateQuery<FeatureFlagDocument>,
+    options: QueryOptions<FeatureFlagDocument>,
+  ): Promise<UpdateWriteOpResult> {
+    return this.featureFlagModel.updateMany(filter, update, options);
+  }
+
+  public async removeTargetGroup(targetGroupId: string, featureFlagIds?: string[]): Promise<boolean> {
+    if (!featureFlagIds) {
+      const query = await this.updateMany({}, { $pullAll: { targetGroups: [targetGroupId] } }, { new: true });
+      return query.acknowledged;
+    }
+
+    const query = await this.updateMany(
+      { _id: { $in: featureFlagIds } },
+      { $pullAll: { targetGroups: [targetGroupId] } },
+      { new: true },
+    );
+    return query.acknowledged;
+  }
+
   public async delete(id: string): Promise<FeatureFlag | null> {
-    return this.featureFlagModel.findByIdAndRemove(id);
+    return this.featureFlagModel.findByIdAndDelete(id);
   }
 }

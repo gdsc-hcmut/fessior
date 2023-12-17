@@ -25,6 +25,6 @@ export class TemplatesService {
   }
 
   public async delete(id: string): Promise<Template | null> {
-    return this.templateModel.findByIdAndRemove({ _id: id }).exec();
+    return this.templateModel.findByIdAndDelete(id).exec();
   }
 }

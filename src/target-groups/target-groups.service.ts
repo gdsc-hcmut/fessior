@@ -5,10 +5,14 @@ import { Model, Types } from 'mongoose';
 import { CreateTargetGroupDto } from './dto/create-target-group.dto';
 import { UpdateTargetGroupDto } from './dto/update-target-group.dto';
 import { TargetGroup } from './schemas/target-group.schema';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 
 @Injectable()
 export class TargetGroupsService {
-  constructor(@InjectModel('TargetGroup') private readonly targetGroupModel: Model<TargetGroup>) {}
+  constructor(
+    @InjectModel('TargetGroup') private readonly targetGroupModel: Model<TargetGroup>,
+    private readonly featureFlagsService: FeatureFlagsService,
+  ) {}
 
   public async create(createTargetGroupDto: CreateTargetGroupDto): Promise<TargetGroup> {
     const { name, users, organizations } = createTargetGroupDto;
@@ -59,6 +63,11 @@ export class TargetGroupsService {
   }
 
   public async delete(id: string): Promise<TargetGroup | null> {
-    return this.targetGroupModel.findByIdAndRemove({ _id: id }).exec();
+    const isUpdated = await this.featureFlagsService.removeTargetGroup(id);
+    if (!isUpdated) {
+      throw new BadRequestException('Remove target group from feature flags failed');
+    }
+
+    return this.targetGroupModel.findByIdAndDelete(id).exec();
   }
 }
