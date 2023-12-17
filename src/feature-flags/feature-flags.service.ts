@@ -67,8 +67,9 @@ export class FeatureFlagsService {
         res[ff.key] = true;
         continue;
       }
+
       for (let j = 0; j < ff.targetGroups.length; j += 1) {
-        const group = ff.targetGroups[i];
+        const group = ff.targetGroups[j];
         if (group.users.includes(userId)) {
           res[ff.key] = true;
           break;
