@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId } from 'mongoose';
 
+import { Organization } from '../../organization/schemas/organization.schema';
 import { User } from '../../users/schemas/user.schema';
 
 export type UrlDocument = HydratedDocument<Url>;
@@ -19,6 +20,9 @@ export class Url {
   @Prop({ required: true })
   public totalClicks: { clickedAt: Date; origin: string; ip: string }[];
 
+  @Prop({ required: true, ref: Organization.name })
+  public organizationId: ObjectId;
+
   @Prop()
   public platform: string;
 
@@ -31,4 +35,5 @@ export class Url {
 
 export const UrlSchema = SchemaFactory.createForClass(Url);
 
-UrlSchema.index({ originalUrl: 1, domain: 1 }, { unique: true });
+UrlSchema.index({ domain: 1, slug: 1 }, { unique: true });
+UrlSchema.index({ organizationId: 1, createdAt: 1 }, { unique: false });

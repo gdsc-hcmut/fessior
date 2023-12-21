@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateUrlDto {
@@ -13,8 +13,8 @@ export class CreateUrlDto {
   @IsString()
   public readonly domain: string;
 
-  // @IsMongoId()
-  // public readonly organization: Types.ObjectId;
+  @IsMongoId()
+  public readonly organizationId: Types.ObjectId;
 
   @IsOptional()
   public createdBy: Types.ObjectId;
