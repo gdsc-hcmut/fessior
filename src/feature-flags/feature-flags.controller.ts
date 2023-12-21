@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Patch, NotFoundException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ControllerResponse, Request } from 'src/constants/types';
+import { injectUserId } from 'src/utils';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
@@ -20,8 +21,8 @@ export class FeatureFlagsController {
     @Req() req: Request,
     @Body() dto: CreateFeatureFlagDto,
   ): Promise<ControllerResponse<FeatureFlag>> {
-    dto.createdBy = req.tokenMeta.userId;
-    dto.updatedBy = req.tokenMeta.userId;
+    injectUserId(dto, req.tokenMeta.userId);
+
     const newFeatureFlag = await this.featureFlagsService.create(dto);
     return { payload: newFeatureFlag };
   }
