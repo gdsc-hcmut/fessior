@@ -47,7 +47,10 @@ export class OrganizationsService {
   }
 
   public async isAllowedToUseDomain(manager: string, domain: string): Promise<boolean> {
-    const org = await this.findOne({ managers: { manager }, domains: { domain } });
+    const org = await this.findOne({
+      managers: { $eq: manager },
+      domains: { $eq: domain },
+    });
 
     return !!org;
   }

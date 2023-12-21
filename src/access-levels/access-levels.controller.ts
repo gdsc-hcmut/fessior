@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards, Req, Get, Param, Patch, Delete, NotF
 import { ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse, Request } from 'src/constants/types';
+import { injectUserId } from 'src/utils';
 
 import { AccessLevelsService } from './access-levels.service';
 import { CreateAccessLevelDto } from './dto/create-access-level.dto';
@@ -21,8 +22,7 @@ export class AccessLevelsController {
     @Req() req: Request,
     @Body() dto: CreateAccessLevelDto,
   ): Promise<ControllerResponse<AccessLevel>> {
-    dto.createdBy = req.tokenMeta.userId;
-    dto.updatedBy = req.tokenMeta.userId;
+    injectUserId(dto, req.tokenMeta.userId);
 
     return { payload: await this.accessLevelsService.create(dto) };
   }

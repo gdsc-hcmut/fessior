@@ -1,4 +1,5 @@
-import { Origin } from 'src/constants/types';
+import { Types } from 'mongoose';
+import { CreateDto, Origin } from 'src/constants/types';
 
 export const toOrigin = {
   'https://l.messenger.com/': Origin.MESSENGER,
@@ -29,4 +30,9 @@ export function getOrigin(referer: string): string {
     return 'Youtube';
   }
   return '';
+}
+
+export function injectUserId(dto: CreateDto, userId: Types.ObjectId): void {
+  dto.createdBy = userId;
+  dto.updatedBy = userId;
 }

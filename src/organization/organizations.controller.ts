@@ -16,6 +16,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse, Request } from 'src/constants/types';
+import { injectUserId } from 'src/utils';
 
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -36,8 +37,7 @@ export class OrganizationsController {
     @Req() req: Request,
     @Body() dto: CreateOrganizationDto,
   ): Promise<ControllerResponse<Organization>> {
-    dto.createdBy = req.tokenMeta.userId;
-    dto.updatedBy = req.tokenMeta.userId;
+    injectUserId(dto, req.tokenMeta.userId);
 
     return { payload: await this.organizationsService.create(dto) };
   }

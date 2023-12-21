@@ -1,6 +1,11 @@
 import { Request as ERequest } from 'express';
 import { Types } from 'mongoose';
 
+import { CreateAccessLevelDto } from '../access-levels/dto/create-access-level.dto';
+import { CreateFeatureFlagDto } from '../feature-flags/dto/create-feature-flag.dto';
+import { CreateOrganizationDto } from '../organization/dto/create-organization.dto';
+import { CreateUrlDto } from '../urls/dto/create-url.dto';
+
 export type ControllerResponse<T> = {
   payload: T;
   message?: string;
@@ -51,3 +56,5 @@ export enum Referer {
   LINKEDIN = 'https://www.linkedin.com/',
   YOUTUBE = 'https://www.youtube.com/',
 }
+
+export type CreateDto = CreateAccessLevelDto | CreateFeatureFlagDto | CreateOrganizationDto | CreateUrlDto;
