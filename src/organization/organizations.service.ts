@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, ProjectionType, QueryOptions } from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 import { MongooseErrorCode } from 'src/constants/mongo-error-code';
 
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { Organization } from './schemas/organization.schema';
+import { Organization, OrganizationDocument } from './schemas/organization.schema';
 
 @Injectable()
 export class OrganizationsService {
@@ -28,11 +28,34 @@ export class OrganizationsService {
     }
   }
 
-  public async findAll(page: number = DEFAULT_PAGE, limit: number = DEFAULT_PAGE_SIZE): Promise<Organization[]> {
+  public async findAllPaginated(
+    page: number = DEFAULT_PAGE,
+    limit: number = DEFAULT_PAGE_SIZE,
+  ): Promise<Organization[]> {
     return this.organizationModel
       .find()
       .skip((page - 1) * limit)
       .limit(limit);
+  }
+
+  public async find(
+    filter: FilterQuery<OrganizationDocument>,
+    projection?: ProjectionType<OrganizationDocument>,
+    options?: QueryOptions<OrganizationDocument>,
+  ): Promise<Organization[]> {
+    return this.organizationModel.find(filter, projection, options);
+  }
+
+  public async isAllowedToUseDomain(manager: string, domain: string): Promise<boolean> {
+    const org = await this.findOne({ managers: { manager }, domains: { domain } });
+
+    return !!org;
+  }
+
+  public async isManager(userId: string, organizationId: string): Promise<boolean> {
+    const org = await this.findOne({ _id: organizationId, managers: userId });
+
+    return !!org;
   }
 
   public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
@@ -41,13 +64,25 @@ export class OrganizationsService {
   }
 
   public async isPartner(userId: string): Promise<boolean> {
-    const organization = await this.organizationModel.findOne({ managers: { $in: [userId] } });
+    const org = await this.findOne({ managers: userId });
 
-    return !!organization;
+    return !!org;
   }
 
-  public async findOne(id: string): Promise<Organization | null> {
-    return this.organizationModel.findById(id);
+  public async findById(
+    id: string,
+    projections?: ProjectionType<OrganizationDocument>,
+    options?: QueryOptions<OrganizationDocument>,
+  ): Promise<Organization | null> {
+    return this.organizationModel.findById(id, projections, options);
+  }
+
+  public async findOne(
+    filter?: FilterQuery<OrganizationDocument>,
+    projections?: ProjectionType<OrganizationDocument>,
+    options?: QueryOptions<OrganizationDocument>,
+  ): Promise<Organization | null> {
+    return this.organizationModel.findOne(filter, projections, options);
   }
 
   public async updateOne(id: string, dto: UpdateOrganizationDto): Promise<Organization | null> {

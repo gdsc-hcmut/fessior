@@ -18,6 +18,10 @@ export declare global {
 
       GOOGLE_CLIENT_ID: string;
       GOOGLE_CLIENT_SECRET: string;
+
+      FRONTEND_URL: string;
+
+      DEFAULT_DOMAIN: string;
     }
   }
 

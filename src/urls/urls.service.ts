@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, ProjectionType, QueryOptions } from 'mongoose';
 import { customAlphabet } from 'nanoid';
 import { ALPHABET, DEFAULT_DOMAIN, SLUG_REGEX } from 'src/constants';
 import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
-import { Url } from './schemas/url.schema';
+import { Url, UrlDocument } from './schemas/url.schema';
 import { OrganizationsService } from '../organization/organizations.service';
 
 const nanoid = customAlphabet(ALPHABET, 7);
@@ -21,28 +21,11 @@ export class UrlsService {
   ) {}
 
   public async create(dto: CreateUrlDto): Promise<Url> {
-    const { originalUrl, slug, domain = DEFAULT_DOMAIN, createdBy, updatedBy } = dto;
+    const { originalUrl, slug, domain = DEFAULT_DOMAIN, organizationId, createdBy, updatedBy } = dto;
 
-    let page = 1;
-    let isAllowedToUseDomain = false;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     // TODO: cache domain -> organization -> managers
     if (domain !== DEFAULT_DOMAIN) {
-      while (true) {
-        const orgs = await this.organizationsService.findAll(page);
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        orgs.forEach(org => {
-          if (org.managers.includes(createdBy) && org.domains.includes(domain)) {
-            isAllowedToUseDomain = true;
-          }
-        });
-        if (isAllowedToUseDomain || orgs.length === 0) {
-          break;
-        }
-        page += 1;
-      }
-
-      if (!isAllowedToUseDomain) {
+      if (!(await this.organizationsService.isAllowedToUseDomain(createdBy.toString(), domain))) {
         throw new BadRequestException('You are not allowed to use this domain');
       }
     }
@@ -56,9 +39,24 @@ export class UrlsService {
       throw new BadRequestException('Slug is not valid');
     }
 
-    url = await this.urlModel.create({ originalUrl, slug: slug || nanoid(), domain, createdBy, updatedBy });
+    url = await this.urlModel.create({
+      originalUrl,
+      slug: slug || nanoid(),
+      domain,
+      organizationId,
+      createdBy,
+      updatedBy,
+    });
 
     return url;
+  }
+
+  public async find(
+    filter: FilterQuery<UrlDocument>,
+    projection?: ProjectionType<UrlDocument>,
+    options?: QueryOptions<UrlDocument>,
+  ): Promise<Url[]> {
+    return this.urlModel.find(filter, projection, options);
   }
 
   public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
@@ -70,5 +68,9 @@ export class UrlsService {
     url.totalClicks.push({ clickedAt: new Date(), origin: getOrigin(referer), ip: '' });
     await url.save();
     return url.originalUrl;
+  }
+
+  public async getUrlsByOrganizationId(organizationId: string): Promise<Url[]> {
+    return this.find({ organizationId });
   }
 }
