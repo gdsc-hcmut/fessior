@@ -23,12 +23,21 @@ export class UrlsController {
     return { payload: await this.urlsService.create(dto) };
   }
 
-  @Patch(':id')
+  @Patch(':id/slug')
   public async updateSlug(
     @Req() req: Request,
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: UpdateUrlDto,
   ): Promise<ControllerResponse<Url>> {
     return { payload: await this.urlsService.updateSlugById(id, dto.slug, req.tokenMeta.userId.toString()) };
+  }
+
+  @Patch(':id/status')
+  public async updateStatus(
+    @Req() req: Request,
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Body() dto: UpdateUrlDto,
+  ): Promise<ControllerResponse<Url>> {
+    return { payload: await this.urlsService.updateStatusById(id, dto.isActive, req.tokenMeta.userId.toString()) };
   }
 }
