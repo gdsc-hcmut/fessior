@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards, VERSION_NEUTRAL, Version } from '@nestjs/common';
+import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse } from 'src/constants/types';
 
 import { CreateTemplateDto } from './dto/create-template.dto';
@@ -29,12 +30,12 @@ export class TemplatesController {
   }
 
   @Get(':id')
-  public async findOne(@Param('id') id: string): Promise<ControllerResponse<Template | null>> {
+  public async findOne(@Param('id', ObjectIdValidationPipe) id: string): Promise<ControllerResponse<Template | null>> {
     return { payload: await this.templateService.findOne(id) };
   }
 
   @Delete(':id')
-  public async delete(@Param('id') id: string): Promise<ControllerResponse<Template | null>> {
+  public async delete(@Param('id', ObjectIdValidationPipe) id: string): Promise<ControllerResponse<Template | null>> {
     return { payload: await this.templateService.delete(id) };
   }
 }
