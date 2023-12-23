@@ -113,7 +113,29 @@ export class UrlsService {
       throw new BadRequestException('Slug with this domain already exist');
     }
 
+    if (!slug || !SLUG_REGEX.test(slug)) {
+      throw new BadRequestException('Slug is not valid');
+    }
+
     url = await this.findByIdAndUpdate(id, { $set: { slug, updatedBy: userId } }, { new: true });
+    if (!url) {
+      throw new NotFoundException('Url not found');
+    }
+
+    return url;
+  }
+
+  public async updateStatusById(id: string, status: boolean, userId: string): Promise<Url> {
+    let url = await this.findById(id);
+    if (!url) {
+      throw new NotFoundException('Url not found');
+    }
+
+    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+      throw new ForbiddenException('Not allowed');
+    }
+
+    url = await this.findByIdAndUpdate(id, { $set: { isActive: status } }, { new: true });
     if (!url) {
       throw new NotFoundException('Url not found');
     }
