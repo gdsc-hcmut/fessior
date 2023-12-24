@@ -231,4 +231,21 @@ export class UrlsService {
 
     return url;
   }
+
+  public async deleteUrlById(id: string, userId: string): Promise<Url | null> {
+    const url = await this.findById(id);
+    if (!url) {
+      throw new NotFoundException('Url not found');
+    }
+
+    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+      throw new ForbiddenException('You are not allowed');
+    }
+
+    return this.findByIdAndDelete(id);
+  }
+
+  public async findByIdAndDelete(id?: string, options?: QueryOptions<UrlDocument>): Promise<Url | null> {
+    return this.urlModel.findByIdAndDelete(id, options);
+  }
 }
