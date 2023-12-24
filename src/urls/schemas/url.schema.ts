@@ -40,3 +40,4 @@ export const UrlSchema = SchemaFactory.createForClass(Url);
 
 UrlSchema.index({ domain: 1, slug: 1 }, { unique: true });
 UrlSchema.index({ organizationId: 1, updatedAt: 1 }, { unique: false });
+// UrlSchema.index({ slug: 'text', originalUrl: 'text' });

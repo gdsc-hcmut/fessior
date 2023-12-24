@@ -84,6 +84,28 @@ export class OrganizationsController {
     return { payload: { size: urls.length, totalPages, urls } };
   }
 
+  @Get(':id/urls/search')
+  public async searchUrls(
+    @Req() req: Request,
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    // @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
+    // @Query('order', new ParseEnumPipe(Order)) order: Order,
+    @Query('q') q: string,
+  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number }>> {
+    const { userId } = req.tokenMeta;
+
+    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+      throw new ForbiddenException('You are not allowed');
+    }
+
+    const urls = await this.urlsService.searchUrlsByOrganizationId(id, q, page, limit);
+    const totalPages = await this.urlsService.getTotalPages(id, q, limit);
+
+    return { payload: { size: urls.length, totalPages, urls } };
+  }
+
   @Patch(':id')
   public async updateOne(
     @Req() req: Request,

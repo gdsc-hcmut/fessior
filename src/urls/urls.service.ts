@@ -35,10 +35,11 @@ export class UrlsService {
     const { originalUrl, slug, domain = DEFAULT_DOMAIN, organizationId, createdBy, updatedBy } = dto;
 
     // TODO: cache domain -> organization -> managers
-    if (domain !== DEFAULT_DOMAIN) {
-      if (!(await this.organizationsService.isAllowedToUseDomain(createdBy.toString(), domain))) {
-        throw new BadRequestException('You are not allowed to use this domain');
-      }
+    if (
+      domain !== DEFAULT_DOMAIN &&
+      !(await this.organizationsService.isAllowedToUseDomain(createdBy.toString(), domain))
+    ) {
+      throw new BadRequestException('You are not allowed to use this domain');
     }
 
     let url = await this.urlModel.findOne({ slug, domain });
@@ -96,8 +97,21 @@ export class UrlsService {
     return url.originalUrl;
   }
 
-  public async getTotalPages(organizationId: string, limit: number = DEFAULT_PAGE_SIZE): Promise<number> {
-    const count = await this.urlModel.countDocuments({ organizationId });
+  public async getTotalPages(
+    organizationId: string,
+    query?: string,
+    limit: number = DEFAULT_PAGE_SIZE,
+  ): Promise<number> {
+    let count = 0;
+    if (query) {
+      count = await this.urlModel.countDocuments({
+        organizationId,
+        $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }],
+      });
+    } else {
+      count = await this.urlModel.countDocuments({ organizationId });
+    }
+
     if (count % limit) {
       return Math.ceil(count / limit);
     }
@@ -136,6 +150,25 @@ export class UrlsService {
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
+  }
+
+  public async searchUrlsByOrganizationId(
+    organizationId: string,
+    // sort: UrlSortOption,
+    // order: Order,
+    query: string,
+    page: number = DEFAULT_PAGE,
+    limit: number = DEFAULT_PAGE_SIZE,
+  ): Promise<Url[]> {
+    // return this.find({ organizationId, $text: { $search: query } }, (page - 1) * limit, limit, {
+    //   updatedAt: -1,
+    // });
+    return this.find(
+      { organizationId, $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
+      (page - 1) * limit,
+      limit,
+      { updatedAt: -1 },
+    );
   }
 
   public async findByIdAndUpdate(
