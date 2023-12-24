@@ -1,8 +1,19 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  AggregateOptions,
+  FilterQuery,
+  Model,
+  PipelineStage,
+  ProjectionType,
+  QueryOptions,
+  SortOrder,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
 import { customAlphabet } from 'nanoid';
-import { ALPHABET, DEFAULT_DOMAIN, SLUG_REGEX } from 'src/constants';
+import { ALPHABET, DEFAULT_DOMAIN, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, SLUG_REGEX } from 'src/constants';
+import { Order, UrlSortOption } from 'src/constants/types';
 import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
@@ -53,10 +64,13 @@ export class UrlsService {
 
   public async find(
     filter: FilterQuery<UrlDocument>,
+    skip: number = 0,
+    limit: number = DEFAULT_PAGE_SIZE,
+    sortArg?: Record<string, SortOrder>,
     projection?: ProjectionType<UrlDocument>,
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url[]> {
-    return this.urlModel.find(filter, projection, options);
+    return this.urlModel.find(filter, projection, options).sort(sortArg).skip(skip).limit(limit);
   }
 
   public async findOne(
@@ -65,6 +79,10 @@ export class UrlsService {
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url | null> {
     return this.urlModel.findOne(filter, projection, options);
+  }
+
+  public async aggregate(pipeline?: PipelineStage[], options?: AggregateOptions): Promise<Url[]> {
+    return this.urlModel.aggregate(pipeline, options);
   }
 
   public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
@@ -78,8 +96,46 @@ export class UrlsService {
     return url.originalUrl;
   }
 
-  public async getUrlsByOrganizationId(organizationId: string): Promise<Url[]> {
-    return this.find({ organizationId });
+  public async getTotalPages(organizationId: string, limit: number = DEFAULT_PAGE_SIZE): Promise<number> {
+    const count = await this.urlModel.countDocuments({ organizationId });
+    if (count % limit) {
+      return Math.ceil(count / limit);
+    }
+    return count / limit;
+  }
+
+  public async getUrlsByOrganizationId(
+    organizationId: string,
+    sort: UrlSortOption,
+    order: Order,
+    page: number = DEFAULT_PAGE,
+    limit: number = DEFAULT_PAGE_SIZE,
+  ): Promise<Url[]> {
+    if (sort === 'time') {
+      return this.find({ organizationId }, (page - 1) * limit, limit, { updatedAt: order });
+    }
+
+    return this.aggregate([
+      { $match: { organizationId: new Types.ObjectId(organizationId) } },
+      {
+        $project: {
+          originalUrl: 1,
+          slug: 1,
+          domain: 1,
+          organizationId: 1,
+          isActive: 1,
+          platform: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          clickCount: { $size: '$totalClicks' },
+        },
+      },
+      { $sort: { clickCount: order === 'asc' ? 1 : -1, updatedAt: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+    ]);
   }
 
   public async findByIdAndUpdate(
