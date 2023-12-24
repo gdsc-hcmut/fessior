@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Param, Patch, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse, Request } from 'src/constants/types';
@@ -39,5 +39,13 @@ export class UrlsController {
     @Body() dto: UpdateUrlDto,
   ): Promise<ControllerResponse<Url>> {
     return { payload: await this.urlsService.updateStatusById(id, dto.isActive, req.tokenMeta.userId.toString()) };
+  }
+
+  @Delete(':id')
+  public async deleteUrl(
+    @Req() req: Request,
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<ControllerResponse<Url | null>> {
+    return { payload: await this.urlsService.deleteUrlById(id, req.tokenMeta.userId.toString()) };
   }
 }
