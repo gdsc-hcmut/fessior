@@ -58,3 +58,13 @@ export enum Referer {
 }
 
 export type CreateDto = CreateAccessLevelDto | CreateFeatureFlagDto | CreateOrganizationDto | CreateUrlDto;
+
+export enum UrlSortOption {
+  TIME = 'time',
+  CLICKS = 'clicks',
+}
+
+export enum Order {
+  ASC = 'asc',
+  DESC = 'desc',
+}

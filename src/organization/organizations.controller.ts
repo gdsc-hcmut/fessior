@@ -12,10 +12,11 @@ import {
   Delete,
   Patch,
   ForbiddenException,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ObjectIdValidationPipe } from 'src/common';
-import { ControllerResponse, Request } from 'src/constants/types';
+import { ControllerResponse, Order, Request, UrlSortOption } from 'src/constants/types';
 import { injectUserId } from 'src/utils';
 
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -66,14 +67,21 @@ export class OrganizationsController {
   public async getUrls(
     @Req() req: Request,
     @Param('id', ObjectIdValidationPipe) id: string,
-  ): Promise<ControllerResponse<Url[]>> {
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
+    @Query('order', new ParseEnumPipe(Order)) order: Order,
+  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number }>> {
     const { userId } = req.tokenMeta;
 
     if (!(await this.organizationsService.isManager(userId.toString(), id))) {
       throw new ForbiddenException('You are not allowed');
     }
 
-    return { payload: await this.urlsService.getUrlsByOrganizationId(id) };
+    const urls = await this.urlsService.getUrlsByOrganizationId(id, sort, order, page, limit);
+    const totalPages = await this.urlsService.getTotalPages(id, limit);
+
+    return { payload: { size: urls.length, totalPages, urls } };
   }
 
   @Patch(':id')
