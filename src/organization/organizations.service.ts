@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, ProjectionType, QueryOptions } from 'mongoose';
+import { FilterQuery, Model, ProjectionType, QueryOptions, Types } from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 import { MongooseErrorCode } from 'src/constants/mongo-error-code';
 
@@ -46,8 +46,9 @@ export class OrganizationsService {
     return this.organizationModel.find(filter, projection, options);
   }
 
-  public async isAllowedToUseDomain(manager: string, domain: string): Promise<boolean> {
+  public async isAllowedToUseDomain(organizationId: Types.ObjectId, manager: string, domain: string): Promise<boolean> {
     const org = await this.findOne({
+      _id: organizationId,
       managers: { $eq: manager },
       domains: { $eq: domain },
     });
