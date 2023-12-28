@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { FeatureFlagsController } from './feature-flags.controller';
-import { FeatureFlagsService } from './feature-flags.service';
-import { JwtService } from '../jwt/jwt.service';
-import { TokensService } from '../token/tokens.service';
+import { AdminFeatureFlagsController } from './feature-flags.controller';
+import { FeatureFlagsService } from '../../feature-flags/feature-flags.service';
+import { JwtService } from '../../jwt/jwt.service';
+import { TokensService } from '../../token/tokens.service';
 
-describe('FeatureFlagsController', () => {
-  let controller: FeatureFlagsController;
+describe('AdminFeatureFlagsController', () => {
+  let controller: AdminFeatureFlagsController;
   let service: FeatureFlagsService;
 
   const mockFeatureFlags = [
@@ -29,7 +29,7 @@ describe('FeatureFlagsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [FeatureFlagsController],
+      controllers: [AdminFeatureFlagsController],
       providers: [
         {
           provide: FeatureFlagsService,
@@ -56,7 +56,7 @@ describe('FeatureFlagsController', () => {
     }).compile();
 
     service = module.get<FeatureFlagsService>(FeatureFlagsService);
-    controller = module.get<FeatureFlagsController>(FeatureFlagsController);
+    controller = module.get<AdminFeatureFlagsController>(AdminFeatureFlagsController);
   });
 
   it('should be defined', () => {

@@ -6,6 +6,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
 
 import { AccessLevelsModule } from './access-levels/access-levels.module';
+import { AdminAccessLevelsModule } from './admin/access-levels/access-levels.module';
+import { AdminFeatureFlagsModule } from './admin/feature-flags/feature-flags.module';
+import { AdminOrganizationsModule } from './admin/organizations/organizations.module';
+import { AdminTargetGroupsModule } from './admin/target-groups/target-groups.module';
+import { AdminUsersModule } from './admin/users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -47,6 +52,11 @@ import { UsersModule } from './users/users.module';
       rootPath: `${__dirname}/../public`,
       renderPath: '/',
     }),
+    AdminAccessLevelsModule,
+    AdminFeatureFlagsModule,
+    AdminOrganizationsModule,
+    AdminTargetGroupsModule,
+    AdminUsersModule,
     CoreModule,
     JwtModule,
     AuthModule,
@@ -70,14 +80,38 @@ import { UsersModule } from './users/users.module';
         path: 'api',
         children: [
           {
-            path: 'me',
-            module: MeModule,
+            path: 'templates',
+            module: TemplatesModule,
+          },
+          {
+            path: 'access-levels',
+            module: AccessLevelsModule,
           },
           {
             path: 'auth',
             module: AuthModule,
           },
+          {
+            path: 'feature-flags',
+            module: FeatureFlagsModule,
+          },
+          {
+            path: 'me',
+            module: MeModule,
+          },
+          {
+            path: 'organizations',
+            module: OrganizationsModule,
+          },
+          {
+            path: 'target-groups',
+            module: TargetGroupsModule,
+          },
           { path: 'urls', module: UrlsModule },
+          {
+            path: 'users',
+            module: UsersModule,
+          },
         ],
       },
       // Router for admin path
@@ -85,28 +119,24 @@ import { UsersModule } from './users/users.module';
         path: 'admin/api',
         children: [
           {
-            path: 'templates',
-            module: TemplatesModule,
-          },
-          {
-            path: 'users',
-            module: UsersModule,
+            path: 'access-levels',
+            module: AdminAccessLevelsModule,
           },
           {
             path: 'feature-flags',
-            module: FeatureFlagsModule,
-          },
-          {
-            path: 'target-groups',
-            module: TargetGroupsModule,
-          },
-          {
-            path: 'access-levels',
-            module: AccessLevelsModule,
+            module: AdminFeatureFlagsModule,
           },
           {
             path: 'organizations',
-            module: OrganizationsModule,
+            module: AdminOrganizationsModule,
+          },
+          {
+            path: 'target-groups',
+            module: AdminTargetGroupsModule,
+          },
+          {
+            path: 'users',
+            module: AdminUsersModule,
           },
         ],
       },

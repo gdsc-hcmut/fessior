@@ -35,10 +35,7 @@ export class UrlsService {
     const { originalUrl, slug, domain = DEFAULT_DOMAIN, organizationId, createdBy, updatedBy } = dto;
 
     // TODO: cache domain -> organization -> managers
-    if (
-      domain !== DEFAULT_DOMAIN &&
-      !(await this.organizationsService.isAllowedToUseDomain(createdBy.toString(), domain))
-    ) {
+    if (!(await this.organizationsService.isAllowedToUseDomain(organizationId, createdBy.toString(), domain))) {
       throw new BadRequestException('You are not allowed to use this domain');
     }
 
@@ -88,7 +85,7 @@ export class UrlsService {
 
   public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
     const url = await this.urlModel.findOne({ slug, domain });
-    if (!url) {
+    if (!url?.isActive) {
       throw new NotFoundException('URL not found!');
     }
 
@@ -99,8 +96,8 @@ export class UrlsService {
 
   public async getTotalPages(
     organizationId: string,
-    query?: string,
     limit: number = DEFAULT_PAGE_SIZE,
+    query?: string,
   ): Promise<number> {
     let count = 0;
     if (query) {
