@@ -42,6 +42,7 @@ export class MeController {
       isPartner: await this.organizationsService.isPartner(userId.toString()),
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
+      hasPassword: !!profile.password,
     };
 
     return { payload: userResponse };
