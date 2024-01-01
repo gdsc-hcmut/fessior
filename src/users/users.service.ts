@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Expression, Model, ObjectId, Types } from 'mongoose';
+import { Expression, FilterQuery, Model, ObjectId, ProjectionType, QueryOptions, Types, UpdateQuery } from 'mongoose';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -51,7 +51,27 @@ export class UsersService {
   }
 
   public async getByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email });
+    return this.findOne({ email });
+  }
+
+  public async findOne(
+    filter?: FilterQuery<UserDocument>,
+    projection?: ProjectionType<UserDocument>,
+    options?: QueryOptions<UserDocument>,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne(filter, projection, options);
+  }
+
+  public async findByIdAndUpdate(
+    id?: string,
+    update?: UpdateQuery<UserDocument>,
+    options?: QueryOptions<UserDocument>,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(id, update, options);
+  }
+
+  public async updateUserPassword(userId: string, password: string): Promise<UserDocument | null> {
+    return this.findByIdAndUpdate(userId, { $set: { password } }, { new: true });
   }
 
   public async delete(id: string): Promise<UserDocument | null> {

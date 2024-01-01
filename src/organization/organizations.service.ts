@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, ProjectionType, QueryOptions, Types } from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 import { MongooseErrorCode } from 'src/constants/mongo-error-code';
+import { OrganizationType } from 'src/constants/types';
+import { uniqueNamesGenerator, Config, adjectives, colors, animals, NumberDictionary } from 'unique-names-generator';
 
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -13,6 +15,28 @@ export class OrganizationsService {
   private readonly logger: Logger = new Logger(OrganizationsService.name);
 
   constructor(@InjectModel(Organization.name) private readonly organizationModel: Model<Organization>) {}
+
+  public async createOrganizationForUser(userId: Types.ObjectId): Promise<Organization> {
+    // TODO: abstract into UniqueNamesGeneratorModule
+    const numbers = NumberDictionary.generate({ min: 1, max: 999 });
+    const customConfig: Config = {
+      dictionaries: [adjectives, colors, animals, numbers],
+      separator: '-',
+      length: 4,
+    };
+    const uniqueName = uniqueNamesGenerator(customConfig);
+
+    const dto: CreateOrganizationDto = {
+      longName: uniqueName,
+      shortName: uniqueName,
+      managers: [userId],
+      domains: [process.env.DEFAULT_DOMAIN],
+      type: OrganizationType.PERSONAL,
+      createdBy: userId,
+      updatedBy: userId,
+    };
+    return this.create(dto);
+  }
 
   public async create(dto: CreateOrganizationDto): Promise<Organization> {
     try {
@@ -64,7 +88,7 @@ export class OrganizationsService {
 
   public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
     // TODO: cache userId -> organizations
-    return this.organizationModel.find({ managers: { $in: [userId] } });
+    return this.find({ managers: { $eq: new Types.ObjectId(userId) } });
   }
 
   public async isPartner(userId: string): Promise<boolean> {

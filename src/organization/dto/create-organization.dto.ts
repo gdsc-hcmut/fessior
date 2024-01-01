@@ -1,5 +1,6 @@
-import { IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEnum, IsMongoId, IsNotEmpty, IsOptional } from 'class-validator';
 import { Types } from 'mongoose';
+import { OrganizationType } from 'src/constants/types';
 
 export class CreateOrganizationDto {
   @IsNotEmpty()
@@ -14,6 +15,10 @@ export class CreateOrganizationDto {
 
   @IsNotEmpty()
   public readonly domains: string[];
+
+  @IsNotEmpty()
+  @IsEnum(OrganizationType)
+  public readonly type: OrganizationType;
 
   @IsOptional()
   public createdBy: Types.ObjectId;

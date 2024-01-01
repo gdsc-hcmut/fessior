@@ -37,6 +37,9 @@ export class User {
 
   @Prop({ default: false })
   public isManager: boolean;
+
+  @Prop({ minlength: 8, maxlength: 16 })
+  public password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

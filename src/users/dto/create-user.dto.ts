@@ -22,8 +22,11 @@ export class CreateUserDto {
   public readonly dateOfBirth: string | null;
 
   public readonly phone: string | null;
+
+  public readonly password: string | null;
 }
 
 export type UserResponse = UserDocument & {
   readonly isPartner: boolean;
+  readonly hasPassword: boolean;
 };

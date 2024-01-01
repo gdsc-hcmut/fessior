@@ -39,6 +39,11 @@ export enum Permission {
   DELETE_USER_BY_ID = 'DELETE_USER_BY_ID',
 }
 
+export enum OrganizationType {
+  PERSONAL = 'PERSONAL',
+  TEAM = 'TEAM',
+}
+
 export enum Origin {
   MESSENGER = 'Messenger',
   FACEBOOK = 'Facebook',
