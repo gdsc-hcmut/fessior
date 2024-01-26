@@ -9,6 +9,7 @@ import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { middleware } from './app.middleware';
 import { AppModule } from './app.module';
 import { AllExceptionFilter } from './filter/exception.filter';
+import { setupMetrics } from './metrics/metrics';
 
 // TODO enhance this better with ts
 declare const module: any;
@@ -29,6 +30,9 @@ async function bootstrap(): Promise<string> {
 
   // Express Middleware
   middleware(app);
+
+  // Setup metrics endpoint
+  setupMetrics(app);
 
   if (isProduction) {
     app.enable('trust proxy');
