@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE, RouterModule } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,6 +19,7 @@ import { CoreModule } from './core/core.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { JwtModule } from './jwt/jwt.module';
 import { MeModule } from './me/me.module';
+import { ApiMetricsMiddleware } from './metrics/api-metrics.middleware';
 import { OrganizationsModule } from './organization/organizations.module';
 import { RootModule } from './root/root.module';
 import { TargetGroupsModule } from './target-groups/target-groups.module';
@@ -161,4 +162,8 @@ import { UsersModule } from './users/users.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(ApiMetricsMiddleware).forRoutes('*');
+  }
+}
