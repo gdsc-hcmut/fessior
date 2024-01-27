@@ -88,7 +88,7 @@ export class OrganizationsService {
 
   public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
     // TODO: cache userId -> organizations
-    return this.find({ managers: { $eq: new Types.ObjectId(userId) } });
+    return this.find({ managers: { $eq: userId } });
   }
 
   public async isPartner(userId: string): Promise<boolean> {
