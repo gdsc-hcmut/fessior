@@ -2,6 +2,7 @@ import { Request as ERequest } from 'express';
 import { Types } from 'mongoose';
 
 import { CreateAccessLevelDto } from '../access-levels/dto/create-access-level.dto';
+import { CreateCategoryDto } from '../categories/dto/create-category.dto';
 import { CreateFeatureFlagDto } from '../feature-flags/dto/create-feature-flag.dto';
 import { CreateOrganizationDto } from '../organization/dto/create-organization.dto';
 import { CreateUrlDto } from '../urls/dto/create-url.dto';
@@ -62,7 +63,12 @@ export enum Referer {
   YOUTUBE = 'https://www.youtube.com/',
 }
 
-export type CreateDto = CreateAccessLevelDto | CreateFeatureFlagDto | CreateOrganizationDto | CreateUrlDto;
+export type CreateDto =
+  | CreateAccessLevelDto
+  | CreateFeatureFlagDto
+  | CreateOrganizationDto
+  | CreateUrlDto
+  | CreateCategoryDto;
 
 export enum UrlSortOption {
   TIME = 'time',

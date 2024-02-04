@@ -14,6 +14,7 @@ import { AdminUsersModule } from './admin/users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
 import { ExceptionsFilter, CommonModule } from './common';
 import { CoreModule } from './core/core.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
@@ -70,6 +71,7 @@ import { UsersModule } from './users/users.module';
     TargetGroupsModule,
     AccessLevelsModule,
     OrganizationsModule,
+    CategoriesModule,
     RootModule,
     RouterModule.register([
       {
@@ -112,6 +114,10 @@ import { UsersModule } from './users/users.module';
           {
             path: 'users',
             module: UsersModule,
+          },
+          {
+            path: 'categories',
+            module: CategoriesModule,
           },
         ],
       },
