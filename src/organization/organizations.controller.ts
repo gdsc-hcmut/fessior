@@ -99,6 +99,26 @@ export class OrganizationsController {
     return { payload: { size: categories.length, totalPages, categories } };
   }
 
+  @Get(':id/categories/search')
+  public async searchCategories(
+    @Req() req: Request,
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('q') q: string,
+  ): Promise<ControllerResponse<{ categories: Category[]; size: number; totalPages: number }>> {
+    const { userId } = req.tokenMeta;
+
+    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+      throw new ForbiddenException('You are not allowed');
+    }
+
+    const categories = await this.categoriesService.searchCategoriesByOrganizationId(id, q, page, limit);
+    const totalPages = await this.categoriesService.getTotalPages(id, limit, q);
+
+    return { payload: { size: categories.length, totalPages, categories } };
+  }
+
   @Get(':id/categories/:categoryId')
   public async getCategoryById(
     @Req() req: Request,

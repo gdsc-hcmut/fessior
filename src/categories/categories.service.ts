@@ -1,6 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery, UpdateQuery, QueryOptions, ProjectionType, UpdateWriteOpResult } from 'mongoose';
+import {
+  Model,
+  FilterQuery,
+  UpdateQuery,
+  QueryOptions,
+  ProjectionType,
+  UpdateWriteOpResult,
+  SortOrder,
+} from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 
 import { AddUrlToCategoriesDto } from './dto/add-url-to-categories.dto';
@@ -28,6 +36,20 @@ export class CategoriesService {
 
   public async getCategoryById(organizationId: string, categoryId: string): Promise<Category | null> {
     return this.findOne({ _id: categoryId, organization: organizationId });
+  }
+
+  public async searchCategoriesByOrganizationId(
+    organizationId: string,
+    query: string,
+    page: number = DEFAULT_PAGE,
+    limit: number = DEFAULT_PAGE_SIZE,
+  ): Promise<Category[]> {
+    return this.find(
+      { $and: [{ organization: organizationId }, { name: { $regex: query } }] },
+      (page - 1) * limit,
+      limit,
+      { updatedAt: -1 },
+    );
   }
 
   public async updateCategoryById(
@@ -70,8 +92,19 @@ export class CategoriesService {
     return this.findOneAndDelete({ _id: categoryId, organization: organizationId });
   }
 
-  public async getTotalPages(organizationId: string, limit: number = DEFAULT_PAGE_SIZE): Promise<number> {
-    const count = await this.categoryModel.countDocuments({ organization: organizationId });
+  public async getTotalPages(
+    organizationId: string,
+    limit: number = DEFAULT_PAGE_SIZE,
+    query?: string,
+  ): Promise<number> {
+    let count = 0;
+    if (query) {
+      count = await this.categoryModel.countDocuments({
+        $and: [{ organization: organizationId }, { name: { $regex: query } }],
+      });
+    } else {
+      count = await this.categoryModel.countDocuments({ organization: organizationId });
+    }
 
     if (count % limit) {
       return Math.ceil(count / limit);
@@ -85,12 +118,13 @@ export class CategoriesService {
 
   public async find(
     filter: FilterQuery<CategoryDocument>,
-    skip: number,
-    limit: number,
+    skip: number = 0,
+    limit: number = DEFAULT_PAGE_SIZE,
+    sortArg?: Record<string, SortOrder>,
     projection?: ProjectionType<CategoryDocument>,
     options?: QueryOptions<CategoryDocument>,
   ): Promise<Category[]> {
-    return this.categoryModel.find(filter, projection, options).skip(skip).limit(limit);
+    return this.categoryModel.find(filter, projection, options).sort(sortArg).skip(skip).limit(limit);
   }
 
   public async findById(
