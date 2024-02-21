@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery, UpdateQuery, QueryOptions, ProjectionType, UpdateWriteOpResult } from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 
+import { AddUrlToCategoriesDto } from './dto/add-url-to-categories.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category.schema';
@@ -55,16 +56,15 @@ export class CategoriesService {
     return category;
   }
 
-  // public async addUrlToCategories(organizationId: string, dto: AddUrlToCategoriesDto): Promise<boolean> {
-  //   const { categories: categoryIds, updatedBy, url } = dto;
-  //   const ids = categoryIds.map(id => new mongoose.Types.ObjectId(id));
-  //   const query = await this.updateMany(
-  //     { _id: { $in: { ids } }, organization: organizationId },
-  //     { $addToSet: { urls: url }, $set: { updatedBy } },
-  //   );
+  public async addUrlToCategories(organizationId: string, dto: AddUrlToCategoriesDto): Promise<boolean> {
+    const { categories: categoryIds, updatedBy, url } = dto;
+    const query = await this.updateMany(
+      { _id: { $in: categoryIds }, organization: organizationId },
+      { $addToSet: { urls: url }, $set: { updatedBy } },
+    );
 
-  //   return query.acknowledged;
-  // }
+    return query.acknowledged;
+  }
 
   public async deleteCategoryById(organizationId: string, categoryId: string): Promise<Category | null> {
     return this.findOneAndDelete({ _id: categoryId, organization: organizationId });
