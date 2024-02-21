@@ -19,6 +19,7 @@ import { ControllerResponse, Order, Request, UrlSortOption } from 'src/constants
 
 import { OrganizationsService } from './organizations.service';
 import { CategoriesService } from '../categories/categories.service';
+import { AddUrlToCategoriesDto } from '../categories/dto/add-url-to-categories.dto';
 import { UpdateCategoryDto } from '../categories/dto/update-category.dto';
 import { Category } from '../categories/schemas/category.schema';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -118,20 +119,20 @@ export class OrganizationsController {
     return { payload: category };
   }
 
-  // @Patch(':id/categories/add-url')
-  // public async addUrlToCategories(
-  //   @Req() req: Request,
-  //   @Body() dto: AddUrlToCategoriesDto,
-  //   @Param('id', ObjectIdValidationPipe) id: string,
-  // ): Promise<ControllerResponse<boolean>> {
-  //   const { userId } = req.tokenMeta;
-  //   dto.updatedBy = userId;
-  //   if (!(await this.organizationsService.isManager(userId.toString(), id))) {
-  //     throw new ForbiddenException('You are not allowed');
-  //   }
+  @Patch(':id/categories/add-url')
+  public async addUrlToCategories(
+    @Req() req: Request,
+    @Body() dto: AddUrlToCategoriesDto,
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<ControllerResponse<boolean>> {
+    const { userId } = req.tokenMeta;
+    dto.updatedBy = userId;
+    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+      throw new ForbiddenException('You are not allowed');
+    }
 
-  //   return { payload: await this.categoriesService.addUrlToCategories(id, dto) };
-  // }
+    return { payload: await this.categoriesService.addUrlToCategories(id, dto) };
+  }
 
   @Patch(':id/categories/:categoryId')
   public async updateCategoryById(
