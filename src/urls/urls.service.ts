@@ -122,8 +122,11 @@ export class UrlsService {
     page: number = DEFAULT_PAGE,
     limit: number = DEFAULT_PAGE_SIZE,
   ): Promise<Url[]> {
-    if (sort === 'time') {
-      return this.find({ organizationId }, (page - 1) * limit, limit, { updatedAt: order });
+    let sortPipeline: PipelineStage | null = null;
+    if (sort === UrlSortOption.TIME) {
+      sortPipeline = { $sort: { updatedAt: order === Order.ASC ? 1 : -1 } };
+    } else {
+      sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
     }
 
     return this.aggregate([
@@ -143,7 +146,7 @@ export class UrlsService {
           clickCount: { $size: '$totalClicks' },
         },
       },
-      { $sort: { clickCount: order === 'asc' ? 1 : -1, updatedAt: -1 } },
+      sortPipeline,
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
