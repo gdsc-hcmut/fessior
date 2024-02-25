@@ -23,6 +23,7 @@ export class Url {
   @Prop({ required: true, ref: Organization.name })
   public organizationId: ObjectId;
 
+  //
   @Prop({ required: true, default: true })
   public isActive: boolean;
 
