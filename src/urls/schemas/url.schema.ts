@@ -24,6 +24,7 @@ export class Url {
   public organizationId: ObjectId;
 
   //
+  //
   @Prop({ required: true, default: true })
   public isActive: boolean;
 
