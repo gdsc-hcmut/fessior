@@ -96,25 +96,25 @@ export class UrlsService {
     return url.originalUrl;
   }
 
-  public async getTotalPages(
+  public async getTotalPagesAndUrls(
     organizationId: string,
     limit: number = DEFAULT_PAGE_SIZE,
     query?: string,
-  ): Promise<number> {
-    let count = 0;
+  ): Promise<{ totalPages: number; totalUrls: number }> {
+    let totalUrls = 0;
     if (query) {
-      count = await this.urlModel.countDocuments({
+      totalUrls = await this.urlModel.countDocuments({
         organizationId,
         $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }],
       });
     } else {
-      count = await this.urlModel.countDocuments({ organizationId });
+      totalUrls = await this.urlModel.countDocuments({ organizationId });
     }
 
-    if (count % limit) {
-      return Math.ceil(count / limit);
+    if (totalUrls % limit) {
+      return { totalPages: Math.ceil(totalUrls / limit), totalUrls };
     }
-    return count / limit;
+    return { totalPages: totalUrls / limit, totalUrls };
   }
 
   public async getUrlsByOrganizationId(
