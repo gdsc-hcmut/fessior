@@ -63,8 +63,8 @@ export class OrganizationsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
-    // @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
-    // @Query('order', new ParseEnumPipe(Order)) order: Order,
+    @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
+    @Query('order', new ParseEnumPipe(Order)) order: Order,
     @Query('q') q: string,
   ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number }>> {
     const { userId } = req.tokenMeta;
@@ -73,7 +73,7 @@ export class OrganizationsController {
       throw new ForbiddenException('You are not allowed');
     }
 
-    const urls = await this.urlsService.searchUrlsByOrganizationId(id, q, page, limit);
+    const urls = await this.urlsService.searchUrlsByOrganizationId(id, sort, order, q, page, limit);
     const totalPages = await this.urlsService.getTotalPages(id, limit, q);
 
     return { payload: { size: urls.length, totalPages, urls } };

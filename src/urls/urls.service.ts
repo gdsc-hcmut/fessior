@@ -18,6 +18,7 @@ import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
 import { Url, UrlDocument } from './schemas/url.schema';
+import { CategoriesService } from '../categories/categories.service';
 import { OrganizationsService } from '../organization/organizations.service';
 
 const nanoid = customAlphabet(ALPHABET, 7);
@@ -29,6 +30,7 @@ export class UrlsService {
   constructor(
     @InjectModel(Url.name) private readonly urlModel: Model<Url>,
     private readonly organizationsService: OrganizationsService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   public async create(dto: CreateUrlDto): Promise<Url> {
@@ -129,7 +131,7 @@ export class UrlsService {
       sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
     }
 
-    return this.aggregate([
+    const urls = await this.aggregate([
       { $match: { organizationId: new Types.ObjectId(organizationId) } },
       {
         $project: {
@@ -150,25 +152,78 @@ export class UrlsService {
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
+
+    const categories = await this.categoriesService.find({ organization: new Types.ObjectId(organizationId) });
+
+    for (const url of urls) {
+      if (!url.categories) {
+        url.categories = [];
+      }
+      for (const cate of categories) {
+        if (cate.urls.includes(url._id)) {
+          url.categories.push(cate.name);
+        }
+      }
+    }
+
+    return urls;
   }
 
   public async searchUrlsByOrganizationId(
     organizationId: string,
-    // sort: UrlSortOption,
-    // order: Order,
+    sort: UrlSortOption,
+    order: Order,
     query: string,
     page: number = DEFAULT_PAGE,
     limit: number = DEFAULT_PAGE_SIZE,
   ): Promise<Url[]> {
-    // return this.find({ organizationId, $text: { $search: query } }, (page - 1) * limit, limit, {
-    //   updatedAt: -1,
-    // });
-    return this.find(
-      { organizationId, $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
-      (page - 1) * limit,
-      limit,
-      { updatedAt: -1 },
-    );
+    let sortPipeline: PipelineStage | null = null;
+    if (sort === UrlSortOption.TIME) {
+      sortPipeline = { $sort: { updatedAt: order === Order.ASC ? 1 : -1 } };
+    } else {
+      sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
+    }
+
+    const urls = await this.aggregate([
+      { $match: { organizationId: new Types.ObjectId(organizationId) } },
+      {
+        $match: { $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
+      },
+      {
+        $project: {
+          _id: 1,
+          originalUrl: 1,
+          slug: 1,
+          domain: 1,
+          organizationId: 1,
+          isActive: 1,
+          platform: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          clickCount: { $size: '$totalClicks' },
+        },
+      },
+      sortPipeline,
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+    ]);
+
+    const categories = await this.categoriesService.find({ organization: new Types.ObjectId(organizationId) });
+
+    for (const url of urls) {
+      if (!url.categories) {
+        url.categories = [];
+      }
+      for (const cate of categories) {
+        if (cate.urls.includes(url._id)) {
+          url.categories.push(cate.name);
+        }
+      }
+    }
+
+    return urls;
   }
 
   public async findByIdAndUpdate(
