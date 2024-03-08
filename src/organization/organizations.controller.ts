@@ -44,7 +44,7 @@ export class OrganizationsController {
     @Query('limit', ParseIntPipe) limit: number,
     @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
     @Query('order', new ParseEnumPipe(Order)) order: Order,
-  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number }>> {
+  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number; totalUrls: number }>> {
     const { userId } = req.tokenMeta;
 
     if (!(await this.organizationsService.isManager(userId.toString(), id))) {
@@ -52,9 +52,9 @@ export class OrganizationsController {
     }
 
     const urls = await this.urlsService.getUrlsByOrganizationId(id, sort, order, page, limit);
-    const totalPages = await this.urlsService.getTotalPages(id, limit);
+    const { totalPages, totalUrls } = await this.urlsService.getTotalPagesAndUrls(id, limit);
 
-    return { payload: { size: urls.length, totalPages, urls } };
+    return { payload: { urls, size: urls.length, totalPages, totalUrls } };
   }
 
   @Get(':id/urls/search')
@@ -66,7 +66,7 @@ export class OrganizationsController {
     @Query('sort', new ParseEnumPipe(UrlSortOption)) sort: UrlSortOption,
     @Query('order', new ParseEnumPipe(Order)) order: Order,
     @Query('q') q: string,
-  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number }>> {
+  ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number; totalUrls: number }>> {
     const { userId } = req.tokenMeta;
 
     if (!(await this.organizationsService.isManager(userId.toString(), id))) {
@@ -74,9 +74,9 @@ export class OrganizationsController {
     }
 
     const urls = await this.urlsService.searchUrlsByOrganizationId(id, sort, order, q, page, limit);
-    const totalPages = await this.urlsService.getTotalPages(id, limit, q);
+    const { totalPages, totalUrls } = await this.urlsService.getTotalPagesAndUrls(id, limit, q);
 
-    return { payload: { size: urls.length, totalPages, urls } };
+    return { payload: { urls, size: urls.length, totalPages, totalUrls } };
   }
 
   @Get(':id/categories')
