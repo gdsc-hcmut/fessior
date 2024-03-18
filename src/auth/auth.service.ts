@@ -20,7 +20,9 @@ export class AuthService {
     private readonly organizationsService: OrganizationsService,
   ) {}
 
-  public async loginWithGoogleToken(token: string): Promise<{ accessToken: string; hasPassword: boolean }> {
+  public async loginWithGoogleToken(
+    token: string,
+  ): Promise<{ accessToken: string; hasPassword: boolean; isFirstLogin: boolean }> {
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -44,8 +46,9 @@ export class AuthService {
     }
 
     let user = await this.usersService.getByEmail(email);
-
+    let isFirstLogin = false;
     if (!user) {
+      isFirstLogin = true;
       // TODO: apply transaction here, if failed to create user or org, rollback
       user = await this.usersService.create({
         firstName: tokenInfo.given_name || null,
@@ -66,13 +69,13 @@ export class AuthService {
 
     const payload = { tokenId: newToken._id };
 
-    return { accessToken: await this.jwtService.signAsync(payload), hasPassword: !!user.password };
+    return { accessToken: await this.jwtService.signAsync(payload), hasPassword: !!user.password, isFirstLogin };
   }
 
   public async loginWithUsernameAndPassword(
     username: string,
     password: string,
-  ): Promise<{ accessToken: string; hasPassword: boolean }> {
+  ): Promise<{ accessToken: string; hasPassword: boolean; isFirstLogin: boolean }> {
     const user = await this.usersService.getByEmail(username);
     if (!user) {
       throw new NotFoundException('Username not found');
@@ -87,7 +90,7 @@ export class AuthService {
 
     const payload = { tokenId: newToken._id };
 
-    return { accessToken: await this.jwtService.signAsync(payload), hasPassword: true };
+    return { accessToken: await this.jwtService.signAsync(payload), hasPassword: true, isFirstLogin: false };
   }
 
   public async logout(accessToken: string): Promise<void> {
