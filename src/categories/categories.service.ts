@@ -116,15 +116,20 @@ export class CategoriesService {
     return this.categoryModel.create(dto);
   }
 
-  public async find(
+  public async find<T>(
     filter: FilterQuery<CategoryDocument>,
     skip: number = 0,
     limit: number = DEFAULT_PAGE_SIZE,
     sortArg?: Record<string, SortOrder>,
     projection?: ProjectionType<CategoryDocument>,
     options?: QueryOptions<CategoryDocument>,
-  ): Promise<Category[]> {
-    return this.categoryModel.find(filter, projection, options).sort(sortArg).skip(skip).limit(limit);
+  ): Promise<T[]> {
+    return this.categoryModel
+      .find<T>(filter, projection, options)
+      .sort(sortArg)
+      .skip(skip)
+      .limit(limit)
+      .populate('urls');
   }
 
   public async findById(
@@ -162,9 +167,8 @@ export class CategoriesService {
   public async updateMany(
     filter?: FilterQuery<CategoryDocument>,
     update?: UpdateQuery<CategoryDocument>,
-    options?: QueryOptions<CategoryDocument>,
   ): Promise<UpdateWriteOpResult> {
-    return this.categoryModel.updateMany(filter, update, options);
+    return this.categoryModel.updateMany(filter, update);
   }
 
   public async findByIdAndDelete(id?: string, options?: QueryOptions<CategoryDocument>): Promise<Category | null> {

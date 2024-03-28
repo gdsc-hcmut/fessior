@@ -4,11 +4,15 @@ import { HydratedDocument, ObjectId } from 'mongoose';
 import { Organization } from '../../organization/schemas/organization.schema';
 import { Url } from '../../urls/schemas/url.schema';
 import { User } from '../../users/schemas/user.schema';
+import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
+import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 
 export type CategoryDocument = HydratedDocument<Category>;
 
-@Schema({ timestamps: true })
-export class Category {
+export const CategoryDatabaseName = 'Category';
+
+@DatabaseEntity({ collection: CategoryDatabaseName })
+export class Category extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ required: true })
   public name: string;
 

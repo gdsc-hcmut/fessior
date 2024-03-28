@@ -1,13 +1,17 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId } from 'mongoose';
 
 import { Organization } from '../../organization/schemas/organization.schema';
 import { User } from '../../users/schemas/user.schema';
+import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
+import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 
 export type UrlDocument = HydratedDocument<Url>;
 
-@Schema({ timestamps: true })
-export class Url {
+export const UrlDatabaseName = 'Url';
+
+@DatabaseEntity({ collection: UrlDatabaseName })
+export class Url extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ required: true })
   public originalUrl: string;
 
