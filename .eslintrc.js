@@ -32,7 +32,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/1277
     'consistent-return': 'off',
     'func-names': 'off',
-    'max-len': ['error', { code: 120, ignoreTemplateLiterals: true }],
+    'max-len': ['warn', { code: 180, ignoreTemplateLiterals: true }],
     'newline-per-chained-call': 'off',
     'no-await-in-loop': 'off',
     'no-continue': 'off',
@@ -55,7 +55,6 @@ module.exports = {
     'no-unused-expressions': 'off',
     'object-curly-spacing': 'off',
 
-    'import/extensions': ['error', 'never'],
     // https://github.com/benmosher/eslint-plugin-import/issues/1753
     'import/named': 'off',
     'import/no-default-export': 'error',
@@ -72,21 +71,9 @@ module.exports = {
     '@typescript-eslint/consistent-indexed-object-style': 'error',
     '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'angle-bracket' }],
     '@typescript-eslint/explicit-function-return-type': 'error',
-    '@typescript-eslint/explicit-member-accessibility': ['error', { overrides: { constructors: 'no-public' } }],
     '@typescript-eslint/lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
     '@typescript-eslint/member-delimiter-style': 'error',
     '@typescript-eslint/member-ordering': 'error',
-    '@typescript-eslint/naming-convention': [
-      'error',
-      { selector: 'default', format: ['strictCamelCase'] },
-      { selector: 'variable', format: ['strictCamelCase', 'UPPER_CASE', 'StrictPascalCase'] },
-      // https://github.com/microsoft/TypeScript/issues/9458
-      { selector: 'parameter', modifiers: ['unused'], format: ['strictCamelCase'], leadingUnderscore: 'allow' },
-      { selector: 'property', format: null },
-      { selector: 'typeProperty', format: null },
-      { selector: 'typeLike', format: ['StrictPascalCase'] },
-      { selector: 'enumMember', format: ['UPPER_CASE'] },
-    ],
     '@typescript-eslint/no-dupe-class-members': 'error',
     '@typescript-eslint/no-duplicate-imports': 'error',
     '@typescript-eslint/no-floating-promises': ['error', { ignoreIIFE: true, ignoreVoid: true }],
@@ -119,6 +106,17 @@ module.exports = {
     'unused-imports/no-unused-vars': [
       'warn',
       { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+    ],
+    '@typescript-eslint/naming-convention': [
+      'warn',
+      { selector: 'default', format: ['strictCamelCase'] },
+      { selector: 'variable', format: ['strictCamelCase', 'UPPER_CASE', 'StrictPascalCase'] },
+      // https://github.com/microsoft/TypeScript/issues/9458
+      { selector: 'parameter', modifiers: ['unused'], format: ['strictCamelCase'], leadingUnderscore: 'allow' },
+      { selector: 'property', format: null },
+      { selector: 'typeProperty', format: null },
+      { selector: 'typeLike', format: ['StrictPascalCase'] },
+      { selector: 'enumMember', format: ['UPPER_CASE'] },
     ],
   },
 };

@@ -12,11 +12,13 @@ import {
   UpdateQuery,
 } from 'mongoose';
 import { customAlphabet } from 'nanoid';
+import { ICategoryEntity } from 'src/categories/interfaces';
 import { ALPHABET, DEFAULT_DOMAIN, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, SLUG_REGEX } from 'src/constants';
 import { Order, UrlSortOption } from 'src/constants/types';
 import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
+import { IUrlEntity } from './interfaces';
 import { Url, UrlDocument } from './schemas/url.schema';
 import { CategoriesService } from '../categories/categories.service';
 import { OrganizationsService } from '../organization/organizations.service';
@@ -81,8 +83,8 @@ export class UrlsService {
     return this.urlModel.findOne(filter, projection, options);
   }
 
-  public async aggregate(pipeline?: PipelineStage[], options?: AggregateOptions): Promise<Url[]> {
-    return this.urlModel.aggregate(pipeline, options);
+  public async aggregate<T>(pipeline?: PipelineStage[], options?: AggregateOptions): Promise<T[]> {
+    return this.urlModel.aggregate<T>(pipeline, options);
   }
 
   public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
@@ -131,7 +133,7 @@ export class UrlsService {
       sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
     }
 
-    const urls = await this.aggregate([
+    const urls = await this.aggregate<IUrlEntity>([
       { $match: { organizationId: new Types.ObjectId(organizationId) } },
       {
         $project: {
@@ -153,15 +155,14 @@ export class UrlsService {
       { $limit: limit },
     ]);
 
-    const categories = await this.categoriesService.find({ organization: new Types.ObjectId(organizationId) });
+    const categories = await this.categoriesService.find<ICategoryEntity>({
+      organization: new Types.ObjectId(organizationId),
+    });
 
     for (const url of urls) {
-      if (!url.categories) {
-        url.categories = [];
-      }
-      for (const cate of categories) {
-        if (cate.urls.includes(url._id)) {
-          url.categories.push(cate.name);
+      for (const category of categories) {
+        if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
+          url.categories.push(category);
         }
       }
     }
@@ -184,7 +185,7 @@ export class UrlsService {
       sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
     }
 
-    const urls = await this.aggregate([
+    const urls = await this.aggregate<IUrlEntity>([
       { $match: { organizationId: new Types.ObjectId(organizationId) } },
       {
         $match: { $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
@@ -210,15 +211,14 @@ export class UrlsService {
       { $limit: limit },
     ]);
 
-    const categories = await this.categoriesService.find({ organization: new Types.ObjectId(organizationId) });
+    const categories = await this.categoriesService.find<ICategoryEntity>({
+      organization: new Types.ObjectId(organizationId),
+    });
 
     for (const url of urls) {
-      if (!url.categories) {
-        url.categories = [];
-      }
-      for (const cate of categories) {
-        if (cate.urls.includes(url._id)) {
-          url.categories.push(cate.name);
+      for (const category of categories) {
+        if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
+          url.categories.push(category);
         }
       }
     }

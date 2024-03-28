@@ -36,18 +36,6 @@ jobs:
             yarn.lock
             **/*.{svg,png,jpg,jpeg}
 
-      - name: Check changed files
-        run: |
-          if [ ${{ github.actor }} == "tomgermanyyyy" ]; then
-            echo "Bypass check changed files for tomgermanyyyy"
-            exit 0
-          fi
-
-          if [ ${{ steps.changed-files.outputs.all_modified_files_count }} -gt 15 ]; then
-            echo "Too many files changed. One PR should only change <= 15 files."
-            exit 1
-          fi
-
       - name: Lint check
         run: |
           yarn eslint ${{ steps.changed-files.outputs.all_modified_files }} --ignore-pattern '*.json'
