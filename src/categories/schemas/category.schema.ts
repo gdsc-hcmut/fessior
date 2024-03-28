@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import { HydratedDocument, ObjectId, Types } from 'mongoose';
 
 import { Organization } from '../../organization/schemas/organization.schema';
 import { Url } from '../../urls/schemas/url.schema';
@@ -9,7 +9,7 @@ import { DatabaseEntity } from 'src/common/database/decorators/database.decorato
 
 export type CategoryDocument = HydratedDocument<Category>;
 
-export const CategoryDatabaseName = 'Category';
+export const CategoryDatabaseName = 'categories';
 
 @DatabaseEntity({ collection: CategoryDatabaseName })
 export class Category extends DatabaseMongoObjectIdEntityAbstract {
@@ -22,8 +22,8 @@ export class Category extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ required: true, ref: Organization.name })
   public organization: ObjectId;
 
-  @Prop({ required: true, ref: Url.name })
-  public urls: ObjectId[];
+  @Prop({ required: true, type: [{type: Types.ObjectId, ref: Url.name}] })
+  public urls: Types.ObjectId[];
 
   @Prop({ required: true, ref: User.name })
   public createdBy: ObjectId;

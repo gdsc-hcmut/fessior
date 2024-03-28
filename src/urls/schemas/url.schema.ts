@@ -8,7 +8,7 @@ import { DatabaseEntity } from 'src/common/database/decorators/database.decorato
 
 export type UrlDocument = HydratedDocument<Url>;
 
-export const UrlDatabaseName = 'Url';
+export const UrlDatabaseName = 'urls';
 
 @DatabaseEntity({ collection: UrlDatabaseName })
 export class Url extends DatabaseMongoObjectIdEntityAbstract {
