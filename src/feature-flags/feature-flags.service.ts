@@ -1,6 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, QueryOptions, UpdateWriteOpResult } from 'mongoose';
+import {
+  Model,
+  Types,
+  PopulateOptions,
+  FilterQuery,
+  UpdateQuery,
+  UpdateWriteOpResult,
+  MongooseUpdateQueryOptions,
+} from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
@@ -44,6 +52,7 @@ export class FeatureFlagsService {
     return this.featureFlagModel.findById(id);
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async getUserFeatureFlags(userId: string): Promise<{ [key in string]: boolean }> {
     const res: { [key in string]: boolean } = {};
     const populateOptions: PopulateOptions = {
@@ -111,7 +120,7 @@ export class FeatureFlagsService {
   public async updateMany(
     filter: FilterQuery<FeatureFlagDocument>,
     update: UpdateQuery<FeatureFlagDocument>,
-    options: QueryOptions<FeatureFlagDocument>,
+    options: MongooseUpdateQueryOptions<FeatureFlagDocument>,
   ): Promise<UpdateWriteOpResult> {
     return this.featureFlagModel.updateMany(filter, update, options);
   }

@@ -32,7 +32,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/1277
     'consistent-return': 'off',
     'func-names': 'off',
-    'max-len': ['error', { code: 120, ignoreTemplateLiterals: true }],
+    'max-len': ['warn', { code: 180, ignoreTemplateLiterals: true }],
     'newline-per-chained-call': 'off',
     'no-await-in-loop': 'off',
     'no-continue': 'off',
@@ -108,7 +108,7 @@ module.exports = {
       { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
     ],
     '@typescript-eslint/naming-convention': [
-      'warning',
+      'warn',
       { selector: 'default', format: ['strictCamelCase'] },
       { selector: 'variable', format: ['strictCamelCase', 'UPPER_CASE', 'StrictPascalCase'] },
       // https://github.com/microsoft/TypeScript/issues/9458

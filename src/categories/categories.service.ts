@@ -15,7 +15,6 @@ import { AddUrlToCategoriesDto } from './dto/add-url-to-categories.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from './schemas/category.schema';
-import { run } from 'node:test';
 
 @Injectable()
 export class CategoriesService {
@@ -126,7 +125,8 @@ export class CategoriesService {
     options?: QueryOptions<CategoryDocument>,
   ): Promise<T[]> {
     return this.categoryModel
-      .find<T>(filter, projection, options).select('name color organization createdBy updatedBy urls')
+      .find<T>(filter, projection, options)
+      .select('name color organization createdBy updatedBy urls')
       .sort(sortArg)
       .skip(skip)
       .limit(limit)

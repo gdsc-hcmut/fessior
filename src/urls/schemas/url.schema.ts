@@ -1,10 +1,10 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId } from 'mongoose';
+import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
+import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 
 import { Organization } from '../../organization/schemas/organization.schema';
 import { User } from '../../users/schemas/user.schema';
-import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
-import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 
 export type UrlDocument = HydratedDocument<Url>;
 

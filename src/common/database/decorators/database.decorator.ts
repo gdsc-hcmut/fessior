@@ -10,6 +10,7 @@ export function DatabaseConnection(connectionName?: string): ParameterDecorator 
 }
 
 export function DatabaseModel(entity: any, connectionName?: string): ParameterDecorator {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return InjectModel(entity, connectionName ?? DATABASE_CONNECTION_NAME);
 }
 

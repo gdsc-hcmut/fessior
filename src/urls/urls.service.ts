@@ -12,16 +12,16 @@ import {
   UpdateQuery,
 } from 'mongoose';
 import { customAlphabet } from 'nanoid';
+import { ICategoryEntity } from 'src/categories/interfaces';
 import { ALPHABET, DEFAULT_DOMAIN, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, SLUG_REGEX } from 'src/constants';
 import { Order, UrlSortOption } from 'src/constants/types';
 import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
+import { IUrlEntity } from './interfaces';
 import { Url, UrlDocument } from './schemas/url.schema';
 import { CategoriesService } from '../categories/categories.service';
 import { OrganizationsService } from '../organization/organizations.service';
-import { IUrlEntity } from './interfaces';
-import { ICategoryEntity } from 'src/categories/interfaces';
 
 const nanoid = customAlphabet(ALPHABET, 7);
 
@@ -160,9 +160,6 @@ export class UrlsService {
     });
 
     for (const url of urls) {
-      if (!url.categories) {
-        url.categories = [];
-      }
       for (const category of categories) {
         if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
           url.categories.push(category);
@@ -219,9 +216,6 @@ export class UrlsService {
     });
 
     for (const url of urls) {
-      if (!url.categories) {
-        url.categories = [];
-      }
       for (const category of categories) {
         if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
           url.categories.push(category);
