@@ -1,5 +1,5 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 
@@ -24,7 +24,7 @@ export class Url extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ required: true })
   public totalClicks: { clickedAt: Date; origin: string; ip: string }[];
 
-  @Prop({ required: true, ref: Organization.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: Organization.name })
   public organizationId: ObjectId;
 
   @Prop({ required: true, default: true })
@@ -33,10 +33,10 @@ export class Url extends DatabaseMongoObjectIdEntityAbstract {
   @Prop()
   public platform: string;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public createdBy: ObjectId;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public updatedBy: ObjectId;
 }
 

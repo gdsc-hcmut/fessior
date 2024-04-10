@@ -9,6 +9,8 @@ import { AccessLevel } from './schemas/access-level.schema';
 
 @Injectable()
 export class AccessLevelsService {
+  // private readonly logger: Logger = new Logger(AccessLevelsService.name);
+
   constructor(@InjectModel(AccessLevel.name) private readonly accessLevelModel: Model<AccessLevel>) {}
 
   public async create(dto: CreateAccessLevelDto): Promise<AccessLevel> {

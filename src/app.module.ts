@@ -39,12 +39,12 @@ import { UsersModule } from './users/users.module';
         customProps: () => ({
           context: 'HTTP',
         }),
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            singleLine: true,
-          },
-        },
+        // transport: {
+        //   target: 'pino-pretty',
+        //   options: {
+        //     singleLine: true,
+        //   },
+        // },
       },
     }),
     // Static Folder

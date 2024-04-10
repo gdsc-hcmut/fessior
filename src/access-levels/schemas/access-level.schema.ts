@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 import { Permission } from 'src/constants/types';
 
 import { User } from '../../users/schemas/user.schema';
@@ -17,10 +17,10 @@ export class AccessLevel {
   @Prop({ required: true, ref: User.name })
   public users: ObjectId[];
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public createdBy: ObjectId;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public updatedBy: ObjectId;
 }
 

@@ -18,6 +18,8 @@ import { Category, CategoryDocument } from './schemas/category.schema';
 
 @Injectable()
 export class CategoriesService {
+  // private readonly logger: Logger = new Logger(CategoriesService.name);
+
   constructor(@InjectModel(Category.name) private readonly categoryModel: Model<Category>) {}
 
   public async createCategory(dto: CreateCategoryDto): Promise<Category> {

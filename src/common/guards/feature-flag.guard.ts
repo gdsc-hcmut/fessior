@@ -7,6 +7,8 @@ import { FLAG_KEY } from '../decorators/flags.decorator';
 
 @Injectable()
 export class FeatureFlagGuard implements CanActivate {
+  // private readonly logger: Logger = new Logger(FeatureFlagGuard.name);
+
   constructor(private reflector: Reflector, private readonly featureFlagsService: FeatureFlagsService) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
