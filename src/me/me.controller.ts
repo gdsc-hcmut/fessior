@@ -52,7 +52,7 @@ export class MeController {
   public async getOrganizations(@Req() req: Request): Promise<ControllerResponse<Organization[]>> {
     const { userId } = req.tokenMeta;
 
-    return { payload: await this.organizationsService.getOrganizationsByUserId(userId.toString()) };
+    return { payload: await this.organizationsService.getOrganizationsByUserId(userId) };
   }
 
   @Get('feature-flags')
