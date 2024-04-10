@@ -14,6 +14,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse, Order, Request, UrlSortOption } from 'src/constants/types';
 
@@ -47,7 +48,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number; totalUrls: number }>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -69,7 +70,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<{ urls: Url[]; size: number; totalPages: number; totalUrls: number }>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -88,7 +89,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<{ categories: Category[]; size: number; totalPages: number }>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -109,7 +110,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<{ categories: Category[]; size: number; totalPages: number }>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -127,7 +128,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<Category>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -147,7 +148,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<boolean>> {
     const { userId } = req.tokenMeta;
     dto.updatedBy = userId;
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -163,7 +164,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<Category>> {
     const { userId } = req.tokenMeta;
     dto.updatedBy = userId;
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 
@@ -183,7 +184,7 @@ export class OrganizationsController {
   ): Promise<ControllerResponse<Category | null>> {
     const { userId } = req.tokenMeta;
 
-    if (!(await this.organizationsService.isManager(userId.toString(), id))) {
+    if (!(await this.organizationsService.isManager(userId, new mongoose.Types.ObjectId(id)))) {
       throw new ForbiddenException('You are not allowed');
     }
 

@@ -70,8 +70,8 @@ export class OrganizationsService {
     return !!org;
   }
 
-  public async isManager(userId: string, organizationId: string): Promise<boolean> {
-    const org = await this.findOne({ _id: organizationId, managers: userId });
+  public async isManager(userId: Types.ObjectId, organizationId: Types.ObjectId): Promise<boolean> {
+    const org = await this.findOne({ _id: organizationId, managers: { $contains: userId } });
 
     return !!org;
   }
