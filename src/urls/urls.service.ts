@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   AggregateOptions,
@@ -27,8 +27,6 @@ const nanoid = customAlphabet(ALPHABET, 7);
 
 @Injectable()
 export class UrlsService {
-  private readonly logger: Logger = new Logger(UrlsService.name);
-
   constructor(
     @InjectModel(Url.name) private readonly urlModel: Model<Url>,
     private readonly organizationsService: OrganizationsService,
@@ -227,7 +225,7 @@ export class UrlsService {
   }
 
   public async findByIdAndUpdate(
-    id: string,
+    id: Types.ObjectId,
     update?: UpdateQuery<UrlDocument>,
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url | null> {
@@ -235,20 +233,20 @@ export class UrlsService {
   }
 
   public async findById(
-    id: string,
+    id: Types.ObjectId,
     projection?: ProjectionType<UrlDocument>,
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url | null> {
     return this.urlModel.findById(id, projection, options);
   }
 
-  public async updateSlugById(id: string, slug: string, userId: string): Promise<Url> {
+  public async updateSlugById(id: Types.ObjectId, slug: string, userId: Types.ObjectId): Promise<Url> {
     let url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('Not allowed');
     }
 
@@ -269,13 +267,13 @@ export class UrlsService {
     return url;
   }
 
-  public async updateStatusById(id: string, status: boolean, userId: string): Promise<Url> {
+  public async updateStatusById(id: Types.ObjectId, status: boolean, userId: Types.ObjectId): Promise<Url> {
     let url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('Not allowed');
     }
 
@@ -287,20 +285,20 @@ export class UrlsService {
     return url;
   }
 
-  public async deleteUrlById(id: string, userId: string): Promise<Url | null> {
+  public async deleteUrlById(id: Types.ObjectId, userId: Types.ObjectId): Promise<Url | null> {
     const url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('You are not allowed');
     }
 
     return this.findByIdAndDelete(id);
   }
 
-  public async findByIdAndDelete(id?: string, options?: QueryOptions<UrlDocument>): Promise<Url | null> {
+  public async findByIdAndDelete(id?: Types.ObjectId, options?: QueryOptions<UrlDocument>): Promise<Url | null> {
     return this.urlModel.findByIdAndDelete(id, options);
   }
 }

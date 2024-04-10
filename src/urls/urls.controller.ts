@@ -1,5 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req, Param, Patch, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 import { ObjectIdValidationPipe } from 'src/common';
 import { ControllerResponse, Request } from 'src/constants/types';
 import { injectUserId } from 'src/utils';
@@ -29,7 +30,9 @@ export class UrlsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: UpdateUrlDto,
   ): Promise<ControllerResponse<Url>> {
-    return { payload: await this.urlsService.updateSlugById(id, dto.slug, req.tokenMeta.userId.toString()) };
+    return {
+      payload: await this.urlsService.updateSlugById(new mongoose.Types.ObjectId(id), dto.slug, req.tokenMeta.userId),
+    };
   }
 
   @Patch(':id/status')
@@ -38,7 +41,13 @@ export class UrlsController {
     @Param('id', ObjectIdValidationPipe) id: string,
     @Body() dto: UpdateUrlDto,
   ): Promise<ControllerResponse<Url>> {
-    return { payload: await this.urlsService.updateStatusById(id, dto.isActive, req.tokenMeta.userId.toString()) };
+    return {
+      payload: await this.urlsService.updateStatusById(
+        new mongoose.Types.ObjectId(id),
+        dto.isActive,
+        req.tokenMeta.userId,
+      ),
+    };
   }
 
   @Delete(':id')
@@ -46,6 +55,8 @@ export class UrlsController {
     @Req() req: Request,
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<ControllerResponse<Url | null>> {
-    return { payload: await this.urlsService.deleteUrlById(id, req.tokenMeta.userId.toString()) };
+    return {
+      payload: await this.urlsService.deleteUrlById(new mongoose.Types.ObjectId(id), req.tokenMeta.userId),
+    };
   }
 }
