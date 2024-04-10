@@ -4,7 +4,7 @@ import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, UpdateWriteOpR
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
-import { FeatureFlag, FeatureFlagDocument } from './schemas/feature-flag.schema';
+import { FeatureFlag } from './schemas/feature-flag.schema';
 import { TargetGroup } from '../target-groups/schemas/target-group.schema';
 
 type FeatureFlagPopulated = Omit<FeatureFlag, 'targetGroups'> & { targetGroups: TargetGroup[] };
@@ -110,9 +110,9 @@ export class FeatureFlagsService {
   }
 
   public async updateMany(
-    filter: FilterQuery<FeatureFlagDocument>,
-    update: UpdateQuery<FeatureFlagDocument>,
-    options: QueryOptions<FeatureFlagDocument>,
+    filter: FilterQuery<FeatureFlag>,
+    update: UpdateQuery<FeatureFlag>,
+    options: QueryOptions<FeatureFlag>,
   ): Promise<UpdateWriteOpResult> {
     return this.featureFlagModel.updateMany(filter, update, options);
   }
