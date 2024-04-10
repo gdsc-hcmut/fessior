@@ -4,7 +4,6 @@ import { FilterQuery, Model, ProjectionType, QueryOptions, Types } from 'mongoos
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
 import { MongooseErrorCode } from 'src/constants/mongo-error-code';
 import { OrganizationType } from 'src/constants/types';
-import { uniqueNamesGenerator, Config, adjectives, colors, animals, NumberDictionary } from 'unique-names-generator';
 
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -17,18 +16,9 @@ export class OrganizationsService {
   constructor(@InjectModel(Organization.name) private readonly organizationModel: Model<Organization>) {}
 
   public async createOrganizationForUser(userId: Types.ObjectId): Promise<Organization> {
-    // TODO: abstract into UniqueNamesGeneratorModule
-    const numbers = NumberDictionary.generate({ min: 1, max: 999 });
-    const customConfig: Config = {
-      dictionaries: [adjectives, colors, animals, numbers],
-      separator: '-',
-      length: 4,
-    };
-    const uniqueName = uniqueNamesGenerator(customConfig);
-
     const dto: CreateOrganizationDto = {
-      longName: uniqueName,
-      shortName: uniqueName,
+      longName: 'Personal',
+      shortName: 'Personal',
       managers: [userId],
       domains: [process.env.DEFAULT_DOMAIN],
       type: OrganizationType.PERSONAL,
@@ -80,13 +70,13 @@ export class OrganizationsService {
     return !!org;
   }
 
-  public async isManager(userId: string, organizationId: string): Promise<boolean> {
-    const org = await this.findOne({ _id: organizationId, managers: userId });
+  public async isManager(userId: Types.ObjectId, organizationId: Types.ObjectId): Promise<boolean> {
+    const org = await this.findOne({ _id: organizationId, managers: { $all: [userId] } });
 
     return !!org;
   }
 
-  public async getOrganizationsByUserId(userId: string): Promise<Organization[]> {
+  public async getOrganizationsByUserId(userId: Types.ObjectId): Promise<Organization[]> {
     // TODO: cache userId -> organizations
     return this.find({ managers: { $eq: userId } });
   }

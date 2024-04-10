@@ -12,12 +12,15 @@ import {
   UpdateQuery,
 } from 'mongoose';
 import { customAlphabet } from 'nanoid';
+import { ICategoryEntity } from 'src/categories/interfaces';
 import { ALPHABET, DEFAULT_DOMAIN, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, SLUG_REGEX } from 'src/constants';
 import { Order, UrlSortOption } from 'src/constants/types';
 import { getOrigin } from 'src/utils';
 
 import { CreateUrlDto } from './dto/create-url.dto';
+import { IUrlEntity } from './interfaces';
 import { Url, UrlDocument } from './schemas/url.schema';
+import { CategoriesService } from '../categories/categories.service';
 import { OrganizationsService } from '../organization/organizations.service';
 
 const nanoid = customAlphabet(ALPHABET, 7);
@@ -29,6 +32,7 @@ export class UrlsService {
   constructor(
     @InjectModel(Url.name) private readonly urlModel: Model<Url>,
     private readonly organizationsService: OrganizationsService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   public async create(dto: CreateUrlDto): Promise<Url> {
@@ -79,8 +83,8 @@ export class UrlsService {
     return this.urlModel.findOne(filter, projection, options);
   }
 
-  public async aggregate(pipeline?: PipelineStage[], options?: AggregateOptions): Promise<Url[]> {
-    return this.urlModel.aggregate(pipeline, options);
+  public async aggregate<T>(pipeline?: PipelineStage[], options?: AggregateOptions): Promise<T[]> {
+    return this.urlModel.aggregate<T>(pipeline, options);
   }
 
   public async getOriginalUrl(slug: string, domain: string, referer: string): Promise<string> {
@@ -94,25 +98,25 @@ export class UrlsService {
     return url.originalUrl;
   }
 
-  public async getTotalPages(
+  public async getTotalPagesAndUrls(
     organizationId: string,
     limit: number = DEFAULT_PAGE_SIZE,
     query?: string,
-  ): Promise<number> {
-    let count = 0;
+  ): Promise<{ totalPages: number; totalUrls: number }> {
+    let totalUrls = 0;
     if (query) {
-      count = await this.urlModel.countDocuments({
+      totalUrls = await this.urlModel.countDocuments({
         organizationId,
         $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }],
       });
     } else {
-      count = await this.urlModel.countDocuments({ organizationId });
+      totalUrls = await this.urlModel.countDocuments({ organizationId });
     }
 
-    if (count % limit) {
-      return Math.ceil(count / limit);
+    if (totalUrls % limit) {
+      return { totalPages: Math.ceil(totalUrls / limit), totalUrls };
     }
-    return count / limit;
+    return { totalPages: totalUrls / limit, totalUrls };
   }
 
   public async getUrlsByOrganizationId(
@@ -122,11 +126,14 @@ export class UrlsService {
     page: number = DEFAULT_PAGE,
     limit: number = DEFAULT_PAGE_SIZE,
   ): Promise<Url[]> {
-    if (sort === 'time') {
-      return this.find({ organizationId }, (page - 1) * limit, limit, { updatedAt: order });
+    let sortPipeline: PipelineStage | null = null;
+    if (sort === UrlSortOption.TIME) {
+      sortPipeline = { $sort: { updatedAt: order === Order.ASC ? 1 : -1 } };
+    } else {
+      sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
     }
 
-    return this.aggregate([
+    const urls = await this.aggregate<IUrlEntity>([
       { $match: { organizationId: new Types.ObjectId(organizationId) } },
       {
         $project: {
@@ -143,33 +150,84 @@ export class UrlsService {
           clickCount: { $size: '$totalClicks' },
         },
       },
-      { $sort: { clickCount: order === 'asc' ? 1 : -1, updatedAt: -1 } },
+      sortPipeline,
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
+
+    const categories = await this.categoriesService.find<ICategoryEntity>({
+      organization: new Types.ObjectId(organizationId),
+    });
+
+    for (const url of urls) {
+      for (const category of categories) {
+        if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
+          url.categories.push(category);
+        }
+      }
+    }
+
+    return urls;
   }
 
   public async searchUrlsByOrganizationId(
     organizationId: string,
-    // sort: UrlSortOption,
-    // order: Order,
+    sort: UrlSortOption,
+    order: Order,
     query: string,
     page: number = DEFAULT_PAGE,
     limit: number = DEFAULT_PAGE_SIZE,
   ): Promise<Url[]> {
-    // return this.find({ organizationId, $text: { $search: query } }, (page - 1) * limit, limit, {
-    //   updatedAt: -1,
-    // });
-    return this.find(
-      { organizationId, $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
-      (page - 1) * limit,
-      limit,
-      { updatedAt: -1 },
-    );
+    let sortPipeline: PipelineStage | null = null;
+    if (sort === UrlSortOption.TIME) {
+      sortPipeline = { $sort: { updatedAt: order === Order.ASC ? 1 : -1 } };
+    } else {
+      sortPipeline = { $sort: { clickCount: order === Order.ASC ? 1 : -1, updatedAt: -1 } };
+    }
+
+    const urls = await this.aggregate<IUrlEntity>([
+      { $match: { organizationId: new Types.ObjectId(organizationId) } },
+      {
+        $match: { $or: [{ slug: { $regex: query } }, { originalUrl: { $regex: query } }] },
+      },
+      {
+        $project: {
+          _id: 1,
+          originalUrl: 1,
+          slug: 1,
+          domain: 1,
+          organizationId: 1,
+          isActive: 1,
+          platform: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          createdBy: 1,
+          updatedBy: 1,
+          clickCount: { $size: '$totalClicks' },
+        },
+      },
+      sortPipeline,
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+    ]);
+
+    const categories = await this.categoriesService.find<ICategoryEntity>({
+      organization: new Types.ObjectId(organizationId),
+    });
+
+    for (const url of urls) {
+      for (const category of categories) {
+        if (category.urls.some(categoryUrl => categoryUrl._id.equals(url._id))) {
+          url.categories.push(category);
+        }
+      }
+    }
+
+    return urls;
   }
 
   public async findByIdAndUpdate(
-    id: string,
+    id: Types.ObjectId,
     update?: UpdateQuery<UrlDocument>,
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url | null> {
@@ -177,20 +235,20 @@ export class UrlsService {
   }
 
   public async findById(
-    id: string,
+    id: Types.ObjectId,
     projection?: ProjectionType<UrlDocument>,
     options?: QueryOptions<UrlDocument>,
   ): Promise<Url | null> {
     return this.urlModel.findById(id, projection, options);
   }
 
-  public async updateSlugById(id: string, slug: string, userId: string): Promise<Url> {
+  public async updateSlugById(id: Types.ObjectId, slug: string, userId: Types.ObjectId): Promise<Url> {
     let url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('Not allowed');
     }
 
@@ -211,13 +269,13 @@ export class UrlsService {
     return url;
   }
 
-  public async updateStatusById(id: string, status: boolean, userId: string): Promise<Url> {
+  public async updateStatusById(id: Types.ObjectId, status: boolean, userId: Types.ObjectId): Promise<Url> {
     let url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('Not allowed');
     }
 
@@ -229,20 +287,20 @@ export class UrlsService {
     return url;
   }
 
-  public async deleteUrlById(id: string, userId: string): Promise<Url | null> {
+  public async deleteUrlById(id: Types.ObjectId, userId: Types.ObjectId): Promise<Url | null> {
     const url = await this.findById(id);
     if (!url) {
       throw new NotFoundException('Url not found');
     }
 
-    if (!(await this.organizationsService.isManager(userId, url.organizationId.toString()))) {
+    if (!(await this.organizationsService.isManager(userId, url._id))) {
       throw new ForbiddenException('You are not allowed');
     }
 
     return this.findByIdAndDelete(id);
   }
 
-  public async findByIdAndDelete(id?: string, options?: QueryOptions<UrlDocument>): Promise<Url | null> {
+  public async findByIdAndDelete(id?: Types.ObjectId, options?: QueryOptions<UrlDocument>): Promise<Url | null> {
     return this.urlModel.findByIdAndDelete(id, options);
   }
 }

@@ -1,6 +1,6 @@
 import { IsBoolean, IsEmail } from 'class-validator';
 
-import { UserDocument } from '../schemas/user.schema';
+import { User } from '../schemas/user.schema';
 
 export class CreateUserDto {
   @IsEmail()
@@ -26,7 +26,7 @@ export class CreateUserDto {
   public readonly password: string | null;
 }
 
-export type UserResponse = UserDocument & {
+export type UserResponse = Omit<User, 'password'> & {
   readonly isPartner: boolean;
   readonly hasPassword: boolean;
 };

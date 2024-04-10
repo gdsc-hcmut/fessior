@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
-export class User {
+export class User extends DatabaseMongoObjectIdEntityAbstract {
   @Prop()
   public googleId: string;
 
@@ -28,12 +29,6 @@ export class User {
 
   @Prop({ default: null })
   public phone: string;
-
-  @Prop({ default: Date.now })
-  public createdAt: Date;
-
-  @Prop({ default: Date.now })
-  public updatedAt: Date;
 
   @Prop({ default: false })
   public isManager: boolean;

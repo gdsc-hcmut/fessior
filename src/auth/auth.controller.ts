@@ -13,19 +13,24 @@ import { AuthGuard } from '../common/guards/auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('/login')
-  public async login(@Body() dto: LoginDto): Promise<ControllerResponse<{ token: string; hasPassword: boolean }>> {
+  public async login(
+    @Body() dto: LoginDto,
+  ): Promise<ControllerResponse<{ token: string; hasPassword: boolean; isFirstLogin: boolean }>> {
     const { token, username, password } = dto;
     if (token) {
-      const { accessToken, hasPassword } = await this.authService.loginWithGoogleToken(token);
-      return { payload: { token: accessToken, hasPassword } };
+      const { accessToken, hasPassword, isFirstLogin } = await this.authService.loginWithGoogleToken(token);
+      return { payload: { token: accessToken, hasPassword, isFirstLogin } };
     }
 
     if (!username || !password) {
       throw new BadRequestException('Username or password is invalid');
     }
 
-    const { accessToken, hasPassword } = await this.authService.loginWithUsernameAndPassword(username, password);
-    return { payload: { token: accessToken, hasPassword } };
+    const { accessToken, hasPassword, isFirstLogin } = await this.authService.loginWithUsernameAndPassword(
+      username,
+      password,
+    );
+    return { payload: { token: accessToken, hasPassword, isFirstLogin } };
   }
 
   @Post('/logout')
