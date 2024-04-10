@@ -78,6 +78,10 @@ async function bootstrap(): Promise<string> {
   try {
     const url = await bootstrap();
     NestLogger.log(url, 'Bootstrap');
+
+    if (process.send) {
+      process.send('ready');
+    }
   } catch (error) {
     NestLogger.error(error, 'Bootstrap');
   }
