@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
+import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { Platform } from 'src/constants/types';
 
 import { TargetGroup } from '../../target-groups/schemas/target-group.schema';
@@ -8,7 +9,7 @@ import { User } from '../../users/schemas/user.schema';
 export type FeatureFlagDocument = HydratedDocument<FeatureFlag>;
 
 @Schema({ timestamps: true })
-export class FeatureFlag {
+export class FeatureFlag extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ required: true, unique: true })
   public key: string;
 

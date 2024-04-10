@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, UpdateWriteOpResult, QueryOptions } from 'mongoose';
+import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, UpdateWriteOpResult } from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
@@ -112,21 +112,19 @@ export class FeatureFlagsService {
   public async updateMany(
     filter: FilterQuery<FeatureFlag>,
     update: UpdateQuery<FeatureFlag>,
-    options: QueryOptions<FeatureFlag>,
   ): Promise<UpdateWriteOpResult> {
-    return this.featureFlagModel.updateMany(filter, update, options);
+    return this.featureFlagModel.updateMany(filter, update);
   }
 
   public async removeTargetGroup(targetGroupId: string, featureFlagIds?: string[]): Promise<boolean> {
     if (!featureFlagIds) {
-      const query = await this.updateMany({}, { $pullAll: { targetGroups: [targetGroupId] } }, { new: true });
+      const query = await this.updateMany({}, { $pullAll: { targetGroups: [targetGroupId] } });
       return query.acknowledged;
     }
 
     const query = await this.updateMany(
       { _id: { $in: featureFlagIds } },
       { $pullAll: { targetGroups: [targetGroupId] } },
-      { new: true },
     );
     return query.acknowledged;
   }
