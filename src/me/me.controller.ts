@@ -28,7 +28,7 @@ export class MeController {
     const profile = await this.meService.getProfile(userId);
     if (!profile) return { payload: null };
 
-    const userResponse: UserResponse = {
+    const userResponse = <UserResponse>{
       _id: userId,
       email: profile.email,
       firstName: profile.firstName,

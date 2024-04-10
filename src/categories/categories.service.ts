@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery, UpdateQuery, QueryOptions, ProjectionType, UpdateWriteOpResult } from 'mongoose';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from 'src/constants';
@@ -9,7 +9,7 @@ import { Category, CategoryDocument } from './schemas/category.schema';
 
 @Injectable()
 export class CategoriesService {
-  private readonly logger: Logger = new Logger(CategoriesService.name);
+  // private readonly logger: Logger = new Logger(CategoriesService.name);
 
   constructor(@InjectModel(Category.name) private readonly categoryModel: Model<Category>) {}
 

@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   AggregateOptions,
@@ -24,7 +24,7 @@ const nanoid = customAlphabet(ALPHABET, 7);
 
 @Injectable()
 export class UrlsService {
-  private readonly logger: Logger = new Logger(UrlsService.name);
+  // private readonly logger: Logger = new Logger(UrlsService.name);
 
   constructor(
     @InjectModel(Url.name) private readonly urlModel: Model<Url>,

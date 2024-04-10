@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Permission } from 'src/constants/types';
@@ -9,7 +9,7 @@ import { AccessLevel } from './schemas/access-level.schema';
 
 @Injectable()
 export class AccessLevelsService {
-  private readonly logger: Logger = new Logger(AccessLevelsService.name);
+  // private readonly logger: Logger = new Logger(AccessLevelsService.name);
 
   constructor(@InjectModel(AccessLevel.name) private readonly accessLevelModel: Model<AccessLevel>) {}
 

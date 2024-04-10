@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 
 import { Organization } from '../../organization/schemas/organization.schema';
 import { User } from '../../users/schemas/user.schema';
@@ -20,7 +20,7 @@ export class Url {
   @Prop({ required: true })
   public totalClicks: { clickedAt: Date; origin: string; ip: string }[];
 
-  @Prop({ required: true, ref: Organization.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: Organization.name })
   public organizationId: ObjectId;
 
   @Prop({ required: true, default: true })
@@ -29,10 +29,10 @@ export class Url {
   @Prop()
   public platform: string;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public createdBy: ObjectId;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public updatedBy: ObjectId;
 }
 

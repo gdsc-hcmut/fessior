@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 
 import { Organization } from '../../organization/schemas/organization.schema';
 import { Url } from '../../urls/schemas/url.schema';
@@ -15,16 +15,16 @@ export class Category {
   @Prop({ required: true })
   public color: string;
 
-  @Prop({ required: true, ref: Organization.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: Organization.name })
   public organization: ObjectId;
 
   @Prop({ required: true, ref: Url.name })
   public urls: ObjectId[];
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public createdBy: ObjectId;
 
-  @Prop({ required: true, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public updatedBy: ObjectId;
 }
 
