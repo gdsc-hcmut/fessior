@@ -71,7 +71,7 @@ export class OrganizationsService {
   }
 
   public async isManager(userId: Types.ObjectId, organizationId: Types.ObjectId): Promise<boolean> {
-    const org = await this.findOne({ _id: organizationId, managers: { $contains: userId } });
+    const org = await this.findOne({ _id: organizationId, managers: { $all: [userId] } });
 
     return !!org;
   }
