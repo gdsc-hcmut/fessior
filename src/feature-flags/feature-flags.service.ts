@@ -1,14 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  Model,
-  Types,
-  PopulateOptions,
-  FilterQuery,
-  UpdateQuery,
-  UpdateWriteOpResult,
-  MongooseUpdateQueryOptions,
-} from 'mongoose';
+import { Model, Types, PopulateOptions, FilterQuery, UpdateQuery, UpdateWriteOpResult, QueryOptions } from 'mongoose';
 
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 import { UpdateFeatureFlagDto } from './dto/update-feature-flag.dto';
@@ -120,7 +112,7 @@ export class FeatureFlagsService {
   public async updateMany(
     filter: FilterQuery<FeatureFlagDocument>,
     update: UpdateQuery<FeatureFlagDocument>,
-    options: MongooseUpdateQueryOptions<FeatureFlagDocument>,
+    options: QueryOptions<FeatureFlagDocument>,
   ): Promise<UpdateWriteOpResult> {
     return this.featureFlagModel.updateMany(filter, update, options);
   }

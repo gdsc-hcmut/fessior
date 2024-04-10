@@ -22,8 +22,8 @@ export class Category extends DatabaseMongoObjectIdEntityAbstract {
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: Organization.name })
   public organization: ObjectId;
 
-  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Url.name }] })
-  public urls: Types.ObjectId[];
+  @Prop({ required: true, type: [{ type: mongoose.Schema.Types.ObjectId, ref: Url.name }] })
+  public urls: ObjectId[];
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: User.name })
   public createdBy: ObjectId;
