@@ -60,12 +60,17 @@ export class OrganizationsService {
     return this.organizationModel.find(filter, projection, options);
   }
 
-  public async isAllowedToUseDomain(organizationId: Types.ObjectId, manager: string, domain: string): Promise<boolean> {
+  public async isAllowedToUseDomain(
+    organizationId: Types.ObjectId,
+    manager: Types.ObjectId,
+    domain: string,
+  ): Promise<boolean> {
     const org = await this.findOne({
       _id: organizationId,
-      managers: { $eq: manager },
-      domains: { $eq: domain },
+      managers: { $elemMatch: { $eq: manager } },
+      domains: { $elemMatch: { $eq: domain } },
     });
+    console.log(domain);
 
     return !!org;
   }

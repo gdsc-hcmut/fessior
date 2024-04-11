@@ -39,7 +39,7 @@ export class UrlsService {
     const { originalUrl, slug, domain = DEFAULT_DOMAIN, organizationId, createdBy, updatedBy } = dto;
 
     // TODO: cache domain -> organization -> managers
-    if (!(await this.organizationsService.isAllowedToUseDomain(organizationId, createdBy.toString(), domain))) {
+    if (!(await this.organizationsService.isAllowedToUseDomain(organizationId, createdBy, domain))) {
       throw new BadRequestException('You are not allowed to use this domain');
     }
 
