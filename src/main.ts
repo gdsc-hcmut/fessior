@@ -58,7 +58,10 @@ async function bootstrap(): Promise<string> {
 
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('api-docs', app, document, {
+    jsonDocumentUrl: '/api-docs/swagger.json',
+    yamlDocumentUrl: '/api-docs/swagger.yaml',
+  });
 
   app.enableShutdownHooks();
 
