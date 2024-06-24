@@ -1,0 +1,24 @@
+patch:
+  operationId: Admin_GrantAccessLevel
+  tags:
+    - Access Levels
+  summary: Grant permissions to users
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../../common/components/schemas/ObjectId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/request-bodies/grant.yaml'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/access-level.schema.yaml'

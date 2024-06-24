@@ -1,0 +1,18 @@
+post:
+  operationId: Admin_CreateAccessLevel
+  tags:
+    - Access Levels
+  summary: Create an access level
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/request-bodies/create.yaml'
+  responses:
+    '201':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '../components/access-level.schema.yaml'

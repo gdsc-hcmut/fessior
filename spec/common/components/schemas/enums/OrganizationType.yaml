@@ -1,0 +1,9 @@
+type: string
+enum:
+  - TEAM
+  - PERSONAL
+example: PERSONAL
+description: |
+  The type of organization.
+  TEAM: A team organization.
+  PERSONAL: A personal organization.
