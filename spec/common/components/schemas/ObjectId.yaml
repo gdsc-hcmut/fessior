@@ -1,0 +1,8 @@
+type: string
+pattern: '^[0-9a-f]{24}$'
+example: '5f5b9e6b4f3c3b001f2e3b4d'
+description: |
+  A 24-character hexadecimal string that represents an ObjectId.
+  This is a unique identifier for a document in a MongoDB database.
+  The string consists of 24 characters, where each character is a
+  hexadecimal digit (0-9, a-f).

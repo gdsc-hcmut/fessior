@@ -1,0 +1,41 @@
+openapi: 3.0.0
+info:
+  title: 'Fessior API'
+  version: '1.0.0'
+servers:
+  - url: http://localhost:3000
+    description: Local server
+tags:
+  - name: Access Levels
+    description: Access levels operations
+paths:
+  /v1/admin/api/access-levels:
+    $ref: './access-levels/paths/access-levels.yaml'
+  /v1/admin/api/access-levels/{id}/grant:
+    $ref: './access-levels/paths/access-levels_{id}_grant.yaml'
+  /v1/admin/api/access-levels/{id}:
+    $ref: './access-levels/paths/access-levels_{id}.yaml'
+components:
+  schemas:
+    ObjectId:
+      $ref: './common/components/schemas/ObjectId.yaml'
+
+    # Enums
+    Permission:
+      $ref: './common/components/schemas/enums/Permission.yaml'
+    OrganizationType:
+      $ref: './common/components/schemas/enums/OrganizationType.yaml'
+
+    # Response DTOs
+    AccessLevelDto:
+      $ref: './access-levels/components/access-level.schema.yaml'
+
+    # Request DTOs
+    CreateAccessLevelDto:
+      $ref: './access-levels/components/request-bodies/create.yaml'
+
+    GrantAccessLevelDto:
+      $ref: './access-levels/components/request-bodies/grant.yaml'
+
+    UpdateAccessLevelDto:
+      $ref: './access-levels/components/request-bodies/update.yaml'

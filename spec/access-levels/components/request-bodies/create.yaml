@@ -1,0 +1,18 @@
+type: object
+properties:
+  name:
+    type: string
+  permissions:
+    type: array
+    items:
+      $ref: '../../../common/components/schemas/enums/Permission.yaml'
+    uniqueItems: true
+  users:
+    type: array
+    items:
+      $ref: '../../../common/components/schemas/ObjectId.yaml'
+    uniqueItems: true
+required:
+  - name
+  - permissions
+  - users

@@ -1,0 +1,11 @@
+type: string
+enum:
+  - READ_ALL_USERS
+  - READ_USER_BY_ID
+  - DELETE_USER_BY_ID
+example: READ_ALL_USERS
+description: |
+  The permissions that can be granted to a user.
+  READ_ALL_USERS: Read all users.
+  READ_USER_BY_ID: Read a user by ID.
+  DELETE_USER_BY_ID: Delete a user by ID.

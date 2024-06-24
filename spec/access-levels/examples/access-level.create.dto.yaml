@@ -1,0 +1,8 @@
+Admin:
+  name: 'Admin'
+  permissions: ['READ_ALL_USERS', 'READ_USER_BY_ID', 'DELETE_USER_BY_ID']
+  users: ['5f5b9e6b4f3c3b001f2e3b4d', '2fa34e6b4f3c3b001f2e3b4d']
+User:
+  name: 'User'
+  permission: []
+  users: ['4d92f283fa92da3faed2e9ac', '23abe82ec802faef23d9d0cb', 'adb3234c320def829c9b0afe']

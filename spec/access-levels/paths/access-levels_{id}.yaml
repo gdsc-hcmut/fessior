@@ -1,0 +1,25 @@
+patch:
+  operationId: Admin_UpdateAccessLevel
+  tags:
+    - Access Levels
+  summary: Update an access level
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../../common/components/schemas/ObjectId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/request-bodies/update.yaml'
+
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components/access-level.schema.yaml'
